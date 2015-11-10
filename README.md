@@ -6,7 +6,8 @@ This library contains the java classes used in the verification protocol.
 
 This library has the following dependencies.  All these dependencies will be automatically downloaded by gradle when building or installing the library.
 
- * TODO
+ * [Gson](https://github.com/google/gson)
+ * [credentials_idemix](https://github.com/credentials/credentials_idemix)
 
 ## Building using Gradle (recommended)
 
