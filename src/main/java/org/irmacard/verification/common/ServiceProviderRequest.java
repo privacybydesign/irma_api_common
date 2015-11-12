@@ -30,20 +30,20 @@
 
 package org.irmacard.verification.common;
 
-public class DisclosureQr {
-	private String u;
-	private String v;
+public class ServiceProviderRequest {
+	private String data;
+	private DisclosureProofRequest request;
 
-	DisclosureQr(String version, String url) {
-		v = version;
-		u = url;
+	public ServiceProviderRequest(String data, DisclosureProofRequest request) {
+		this.data = data;
+		this.request = request;
 	}
 
-	public String getVersion() {
-		return v;
+	public DisclosureProofRequest getRequest() {
+		return request;
 	}
 
-	public String getUrl() {
-		return u;
+	public String getServiceProviderData() {
+		return data;
 	}
 }

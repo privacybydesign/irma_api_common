@@ -33,8 +33,6 @@
 
 package org.irmacard.verification.common;
 
-import org.irmacard.credentials.Attributes;
-
 import java.util.Map;
 
 public class DisclosureProofResult {
@@ -48,6 +46,7 @@ public class DisclosureProofResult {
 
 	private Status status;
 	private Map<String, String> attributes;
+	private String data;
 
 	public DisclosureProofResult() {
 		status = Status.VALID;
@@ -67,5 +66,13 @@ public class DisclosureProofResult {
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public String getServiceProviderData() {
+		return data;
+	}
+
+	public void setServiceProviderData(String customData) {
+		this.data = customData;
 	}
 }

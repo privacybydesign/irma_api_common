@@ -178,8 +178,13 @@ public class DisclosureProofRequest {
 
 	@Override
 	public String toString() {
+		return toString(true);
+	}
+
+	public String toString(boolean includeContext) {
 		BigInteger context = this.context;
-		this.context = null;
+		if (!includeContext)
+			this.context = null;
 
 		String val = GsonUtil.getGson().toJson(this);
 
