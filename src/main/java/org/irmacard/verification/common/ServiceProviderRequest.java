@@ -32,9 +32,11 @@ package org.irmacard.verification.common;
 
 public class ServiceProviderRequest {
 	private String data;
+	private int validity = 0;
 	private DisclosureProofRequest request;
 
-	public ServiceProviderRequest(String data, DisclosureProofRequest request) {
+	public ServiceProviderRequest(String data, DisclosureProofRequest request, int validity) {
+		this.validity = validity;
 		this.data = data;
 		this.request = request;
 	}
@@ -45,5 +47,13 @@ public class ServiceProviderRequest {
 
 	public String getServiceProviderData() {
 		return data;
+	}
+
+	public int getValidity() {
+		return validity;
+	}
+
+	public void setValidity(int validity) {
+		this.validity = validity;
 	}
 }
