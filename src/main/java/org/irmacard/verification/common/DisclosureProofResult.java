@@ -33,6 +33,7 @@
 
 package org.irmacard.verification.common;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DisclosureProofResult {
@@ -74,5 +75,13 @@ public class DisclosureProofResult {
 
 	public void setServiceProviderData(String customData) {
 		this.data = customData;
+	}
+
+	public Map<String, Object> getAsMap() {
+		HashMap<String, Object> map = new HashMap<>(3);
+		map.put("status", status);
+		map.put("attributes", attributes);
+		map.put("jti", data);
+		return map;
 	}
 }
