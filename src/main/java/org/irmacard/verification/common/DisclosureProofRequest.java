@@ -113,8 +113,8 @@ public class DisclosureProofRequest {
 		// The rest of this method partially duplicates IRMAIdemixDisclosureProof.verify(). Can't be helped: we
 		// don't have a VerificationDescription handy here.
 
-		// First check for validity
-		if (proof == null || !proof.verify(pk, context, nonce)) {
+		// First check for validity (attribute 1 is metadata which must always be disclosed)
+		if (proof == null || !proof.verify(pk, context, nonce) || proof.getDisclosedAttributes().get(1) == null) {
 			result.setStatus(Status.INVALID);
 			return result;
 		}
