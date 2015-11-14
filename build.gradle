@@ -27,3 +27,9 @@ dependencies {
 
     testCompile "junit:junit:4.11"
 }
+
+if ( project.hasProperty("mavenRepositoryIRMA") ) {
+    uploadArchives.repositories.mavenDeployer {
+        repository(url: mavenRepositoryIRMA)
+    }
+}
