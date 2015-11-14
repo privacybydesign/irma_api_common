@@ -150,7 +150,13 @@ public class DisclosureProofRequest {
 				return result;
 			}
 
-			String value = new String(proof.getDisclosedAttributes().get(index + 2).toByteArray()); // + 2: skip secret key and metadata
+			BigInteger attribute = proof.getDisclosedAttributes().get(index + 2); // + 2: skip secret key and metadata
+			if (attribute == null) {
+				result.setStatus(Status.MISSING_ATTRIBUTES);
+				return result;
+			}
+
+			String value = new String(attribute.toByteArray());
 			attributes.put(issuerName + "." + credentialName + "." + name, value);
 		}
 
