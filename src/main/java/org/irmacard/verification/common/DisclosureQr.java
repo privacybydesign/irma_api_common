@@ -34,7 +34,7 @@ public class DisclosureQr {
 	private String u;
 	private String v;
 
-	DisclosureQr(String version, String url) {
+	public DisclosureQr(String version, String url) {
 		v = version;
 		u = url;
 	}
