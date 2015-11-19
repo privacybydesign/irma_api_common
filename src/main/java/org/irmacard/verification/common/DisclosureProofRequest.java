@@ -119,17 +119,13 @@ public class DisclosureProofRequest {
 			return result;
 		}
 
-		// We put the metadata attribute in a new Attributes, so as to extract the credential ID and check the validity
-		Attributes tempattrs = new Attributes();
-		tempattrs.add(Attributes.META_DATA_FIELD, proof.getDisclosedAttributes().get(1).toByteArray());
-		short id = tempattrs.getCredentialID();
-
-		if (!tempattrs.isValid()) {
+		BigInteger metadata = proof.getDisclosedAttributes().get(1);
+		short id = Attributes.extractCredentialId(metadata);
+		if (!Attributes.isValid(metadata)) {
 			result.setStatus(Status.EXPIRED);
 			return result;
 		}
 
-		// Throw away the attributes instance created above: there's no need to include the metadata attribute
 		HashMap<String, String> attributes = new HashMap<>();
 		result.setAttributes(attributes);
 

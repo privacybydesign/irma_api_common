@@ -23,7 +23,7 @@ sourceSets {
 
 dependencies {
     compile "com.google.code.gson:gson:2.2.2"
-    compile "org.irmacard.credentials:credentials_idemix:0.9.2"
+    compile "org.irmacard.credentials:credentials_idemix:0.10.1"
 
     testCompile "junit:junit:4.11"
 }
