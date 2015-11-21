@@ -46,10 +46,13 @@ import org.irmacard.credentials.info.VerificationDescription;
 import org.irmacard.verification.common.util.GsonUtil;
 import org.irmacard.verification.common.DisclosureProofResult.Status;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
 
-public class DisclosureProofRequest {
+public class DisclosureProofRequest implements Serializable {
+	private static final long serialVersionUID = 1016467840623150897L;
+
 	private BigInteger nonce;
 	private BigInteger context;
 	private List<AttributeDisjunction> content;

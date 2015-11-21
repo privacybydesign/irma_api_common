@@ -39,6 +39,7 @@ public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 	private static final long serialVersionUID = -2053856356082434224L;
 
 	private String label;
+	private transient AttributeIdentifier selected;
 
 	public AttributeDisjunction(String label) {
 		this.label = label;
@@ -56,5 +57,13 @@ public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public AttributeIdentifier getSelected() {
+		return selected;
+	}
+
+	public void setSelected(AttributeIdentifier selected) {
+		this.selected = selected;
 	}
 }
