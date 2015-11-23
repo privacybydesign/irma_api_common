@@ -40,6 +40,7 @@ public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 
 	private String label;
 	private transient AttributeIdentifier selected;
+	private transient boolean satisfied = false;
 
 	public AttributeDisjunction(String label) {
 		this.label = label;
@@ -65,5 +66,23 @@ public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 
 	public void setSelected(AttributeIdentifier selected) {
 		this.selected = selected;
+	}
+
+	public boolean isSatisfied() {
+		return satisfied;
+	}
+
+	public void setSatisfied(boolean satisfied) {
+		this.satisfied = satisfied;
+	}
+
+	public boolean contains(String s) {
+		AttributeIdentifier i = new AttributeIdentifier(s);
+		return this.contains(i);
+	}
+
+	public int indexOf(String s) {
+		AttributeIdentifier i = new AttributeIdentifier(s);
+		return indexOf(i);
 	}
 }

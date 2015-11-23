@@ -80,4 +80,18 @@ public class AttributeIdentifier implements Serializable {
 	public String toString() {
 		return identifier;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof AttributeIdentifier))
+			return false;
+
+		AttributeIdentifier i = (AttributeIdentifier) o;
+		return (this.identifier.equals(i.identifier));
+	}
+
+	@Override
+	public int hashCode() {
+		return identifier.hashCode();
+	}
 }
