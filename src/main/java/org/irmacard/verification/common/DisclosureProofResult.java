@@ -67,6 +67,9 @@ public class DisclosureProofResult {
 
 	public void setStatus(Status status) {
 		this.status = status;
+
+		if (status != Status.VALID)
+			attributes = null;
 	}
 
 	public String getServiceProviderData() {
