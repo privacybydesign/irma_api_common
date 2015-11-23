@@ -36,6 +36,7 @@ package org.irmacard.verification.common;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class DisclosureProofResult {
 	public enum Status {
 		VALID,

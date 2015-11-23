@@ -35,6 +35,7 @@ package org.irmacard.verification.common;
 
 import java.util.ArrayList;
 
+@SuppressWarnings("unused")
 public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 	private static final long serialVersionUID = -2053856356082434224L;
 

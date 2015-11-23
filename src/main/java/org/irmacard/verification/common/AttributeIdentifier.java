@@ -35,6 +35,7 @@ package org.irmacard.verification.common;
 
 import java.io.Serializable;
 
+@SuppressWarnings("unused")
 public class AttributeIdentifier implements Serializable {
 	private static final long serialVersionUID = 1158661160715464298L;
 

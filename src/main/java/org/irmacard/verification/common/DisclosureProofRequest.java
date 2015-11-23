@@ -34,9 +34,8 @@
 package org.irmacard.verification.common;
 
 import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
-import org.irmacard.credentials.idemix.info.IdemixKeyStore;
+import org.irmacard.credentials.idemix.proofs.ProofCollection;
 import org.irmacard.credentials.idemix.proofs.ProofD;
 import org.irmacard.credentials.idemix.util.Crypto;
 import org.irmacard.credentials.info.CredentialDescription;
@@ -50,6 +49,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
 
+@SuppressWarnings("unused")
 public class DisclosureProofRequest implements Serializable {
 	private static final long serialVersionUID = 1016467840623150897L;
 
@@ -101,63 +101,76 @@ public class DisclosureProofRequest implements Serializable {
 		this.context = context;
 	}
 
-	public DisclosureProofResult verify(ProofD proof) throws InfoException {
+	public AttributeDisjunction find(String s) {
+		for (AttributeDisjunction disjuncion : content)
+			if (disjuncion.contains(s))
+				return disjuncion;
+
+		return null;
+	}
+
+	public DisclosureProofResult verify(ProofCollection proofs) throws InfoException {
 		DisclosureProofResult result = new DisclosureProofResult(); // Our return object
+		HashMap<String, String> attributes = new HashMap<>();
+		result.setAttributes(attributes);
 
-		if (!isSimple())
-			throw new IllegalStateException("Non-simple requests not yet supported");
-
-		AttributeIdentifier ai = content.get(0).get(0);
-		String issuerName = ai.getIssuerName();
-		String credentialName = ai.getCredentialName();
-
-		IdemixPublicKey pk = IdemixKeyStore.getInstance().getPublicKey(issuerName);
-
-		// The rest of this method partially duplicates IRMAIdemixDisclosureProof.verify(). Can't be helped: we
-		// don't have a VerificationDescription handy here.
-
-		// First check for validity (attribute 1 is metadata which must always be disclosed)
-		if (proof == null || !proof.verify(pk, context, nonce) || proof.getDisclosedAttributes().get(1) == null) {
+		if (!proofs.verify(context, nonce, true)) {
+			System.out.println("Proofs did not verify");
 			result.setStatus(Status.INVALID);
 			return result;
 		}
 
-		BigInteger metadata = proof.getDisclosedAttributes().get(1);
-		short id = Attributes.extractCredentialId(metadata);
-		if (!Attributes.isValid(metadata)) {
-			result.setStatus(Status.EXPIRED);
-			return result;
-		}
+		for (int i = 0; i < proofs.getProofDcount(); ++i) {
+			ProofD proof = proofs.getProofD(i);
 
-		HashMap<String, String> attributes = new HashMap<>();
-		result.setAttributes(attributes);
-
-		CredentialDescription cd = DescriptionStore.getInstance().getCredentialDescription(id);
-		if (cd == null) {
-			// If the id was not found in DescriptionStore, then whatever attributes are contained in the proof belong
-			// to a credential type we don't know.
-			result.setStatus(Status.MISSING_ATTRIBUTES);
-			return result;
-		}
-
-		// Lookup the requested attributes in the proof
-		for (AttributeDisjunction disjunction : getContent()) {
-			String name = disjunction.get(0).getAttributeName();
-			int index = cd.getAttributeNames().indexOf(name);
-			if (index == -1) {
-				result.setStatus(Status.MISSING_ATTRIBUTES);
+			// Check presence of metadata attribute
+			if (proof.getDisclosedAttributes().get(1) == null) {
+				System.out.println("Metadata attribute missing");
+				result.setStatus(Status.INVALID);
 				return result;
 			}
 
-			BigInteger attribute = proof.getDisclosedAttributes().get(index + 2); // + 2: skip secret key and metadata
-			if (attribute == null) {
-				result.setStatus(Status.MISSING_ATTRIBUTES);
+			// Verify validity, extract credential id from metadata attribute
+			BigInteger metadata = proof.getDisclosedAttributes().get(1);
+			short id = Attributes.extractCredentialId(metadata);
+			if (!Attributes.isValid(metadata)) {
+				result.setStatus(Status.EXPIRED);
 				return result;
 			}
 
-			String value = new String(attribute.toByteArray());
-			attributes.put(issuerName + "." + credentialName + "." + name, value);
+			CredentialDescription cd = DescriptionStore.getInstance().getCredentialDescription(id);
+			if (cd == null) {
+				// If the id was not found in DescriptionStore, then whatever attributes are contained in the proof belong
+				// to a credential type we don't know.
+				System.out.println("CredentialDescription not found");
+				result.setStatus(Status.MISSING_ATTRIBUTES);
+				return result;
+			}
+			String issuer = cd.getIssuerID();
+			String credName = cd.getCredentialID();
+
+			for (int j : proof.getDisclosedAttributes().keySet()) {
+				if (j == 1) // metadata, already processed above
+					continue;
+
+				String attributeName = cd.getAttributeNames().get(j - 2); // Compensate for secret key, metadata
+				String identifier = issuer + "." + credName + "." + attributeName;
+
+				// See if this disclosed attribute occurs in one of our disjunctions
+				AttributeDisjunction disjunction = find(identifier);
+				if (disjunction == null || disjunction.isSatisfied())
+					continue;
+
+				disjunction.setSatisfied(true);
+
+				String value = new String(proof.getDisclosedAttributes().get(j).toByteArray());
+				attributes.put(identifier, value);
+			}
 		}
+
+		for (AttributeDisjunction disjunction : content)
+			if (!disjunction.isSatisfied())
+				result.setStatus(Status.MISSING_ATTRIBUTES);
 
 		return result;
 	}
