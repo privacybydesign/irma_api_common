@@ -36,6 +36,7 @@ package org.irmacard.verification.common.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.idemix.proofs.Proof;
 import org.irmacard.verification.common.AttributeDisjunction;
 
 public class GsonUtil {
@@ -45,6 +46,7 @@ public class GsonUtil {
 		if (gson == null) {
 			gson = new GsonBuilder()
 					.registerTypeAdapter(AttributeDisjunction.class, new AttributeDisjuctionSerializer())
+					.registerTypeAdapter(Proof.class, new ProofSerializer())
 					.create();
 		}
 

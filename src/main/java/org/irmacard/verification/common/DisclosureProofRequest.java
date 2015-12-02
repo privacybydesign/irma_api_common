@@ -35,7 +35,8 @@ package org.irmacard.verification.common;
 
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
-import org.irmacard.credentials.idemix.proofs.ProofCollection;
+import org.irmacard.credentials.idemix.proofs.Proof;
+import org.irmacard.credentials.idemix.proofs.ProofList;
 import org.irmacard.credentials.idemix.proofs.ProofD;
 import org.irmacard.credentials.idemix.util.Crypto;
 import org.irmacard.credentials.info.CredentialDescription;
@@ -109,7 +110,7 @@ public class DisclosureProofRequest implements Serializable {
 		return null;
 	}
 
-	public DisclosureProofResult verify(ProofCollection proofs) throws InfoException {
+	public DisclosureProofResult verify(ProofList proofs) throws InfoException {
 		DisclosureProofResult result = new DisclosureProofResult(); // Our return object
 		HashMap<String, String> attributes = new HashMap<>();
 		result.setAttributes(attributes);
@@ -120,18 +121,21 @@ public class DisclosureProofRequest implements Serializable {
 			return result;
 		}
 
-		for (int i = 0; i < proofs.getProofDcount(); ++i) {
-			ProofD proof = proofs.getProofD(i);
+		for (Proof proof : proofs) {
+			if (!(proof instanceof ProofD))
+				continue;
+
+			ProofD proofD = (ProofD) proof;
 
 			// Check presence of metadata attribute
-			if (proof.getDisclosedAttributes().get(1) == null) {
+			if (proofD.getDisclosedAttributes().get(1) == null) {
 				System.out.println("Metadata attribute missing");
 				result.setStatus(Status.INVALID);
 				return result;
 			}
 
 			// Verify validity, extract credential id from metadata attribute
-			BigInteger metadata = proof.getDisclosedAttributes().get(1);
+			BigInteger metadata = proofD.getDisclosedAttributes().get(1);
 			short id = Attributes.extractCredentialId(metadata);
 			if (!Attributes.isValid(metadata)) {
 				result.setStatus(Status.EXPIRED);
@@ -149,7 +153,7 @@ public class DisclosureProofRequest implements Serializable {
 			String issuer = cd.getIssuerID();
 			String credName = cd.getCredentialID();
 
-			for (int j : proof.getDisclosedAttributes().keySet()) {
+			for (int j : proofD.getDisclosedAttributes().keySet()) {
 				if (j == 1) // metadata, already processed above
 					continue;
 
@@ -163,7 +167,7 @@ public class DisclosureProofRequest implements Serializable {
 
 				disjunction.setSatisfied(true);
 
-				String value = new String(proof.getDisclosedAttributes().get(j).toByteArray());
+				String value = new String(proofD.getDisclosedAttributes().get(j).toByteArray());
 				attributes.put(identifier, value);
 			}
 		}
