@@ -54,8 +54,8 @@ public class AttributeIdentifier implements Serializable {
 			throw new IllegalArgumentException("Invalid value: can't be null or empty");
 
 		int length = value.split("\\.").length;
-		if (length != 3)
-			throw new IllegalArgumentException("Invalid value: must contain 3 parts separated by a dot (value: "
+		if (length != 2 && length != 3)
+			throw new IllegalArgumentException("Invalid value: must contain 2 or 3 parts separated by a dot (value: "
 					+ value + ")");
 
 		identifier = value;
@@ -74,7 +74,14 @@ public class AttributeIdentifier implements Serializable {
 	}
 
 	public String getAttributeName() {
-		return split()[2];
+		if (!isCredential())
+			return split()[2];
+
+		return null;
+	}
+
+	public boolean isCredential() {
+		return split().length == 2;
 	}
 
 	@Override
