@@ -154,11 +154,8 @@ public class DisclosureProofRequest implements Serializable {
 			String credName = cd.getCredentialID();
 
 			for (int j : proofD.getDisclosedAttributes().keySet()) {
-				if (j == 1) // metadata, already processed above
-					continue;
-
-				String attributeName = cd.getAttributeNames().get(j - 2); // Compensate for secret key, metadata
-				String identifier = issuer + "." + credName + "." + attributeName;
+				String attributeName = (j == 1) ? "" : "." + cd.getAttributeNames().get(j - 2);
+				String identifier = issuer + "." + credName + attributeName;
 
 				// See if this disclosed attribute occurs in one of our disjunctions
 				AttributeDisjunction disjunction = find(identifier);
@@ -167,7 +164,7 @@ public class DisclosureProofRequest implements Serializable {
 
 				disjunction.setSatisfied(true);
 
-				String value = new String(proofD.getDisclosedAttributes().get(j).toByteArray());
+				String value = (j == 1) ? "present" : new String(proofD.getDisclosedAttributes().get(j).toByteArray());
 				attributes.put(identifier, value);
 			}
 		}
