@@ -1,4 +1,4 @@
-# IRMA verification common
+# IRMA API common
 
 This library contains the java classes used in the verification protocol.
 

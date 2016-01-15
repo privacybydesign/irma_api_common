@@ -1,5 +1,5 @@
 /*
- * GsonUtil.java
+ * AttributeIdentifier.java
  *
  * Copyright (c) 2015, Sietse Ringers, Radboud University
  * All rights reserved.
@@ -31,25 +31,75 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.verification.common.util;
+package org.irmacard.api.common;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.idemix.proofs.Proof;
-import org.irmacard.verification.common.AttributeDisjunction;
+import java.io.Serializable;
 
-public class GsonUtil {
-	private static Gson gson;
+@SuppressWarnings("unused")
+public class AttributeIdentifier implements Serializable {
+	private static final long serialVersionUID = 1158661160715464298L;
 
-	public static Gson getGson() {
-		if (gson == null) {
-			gson = new GsonBuilder()
-					.registerTypeAdapter(AttributeDisjunction.class, new AttributeDisjuctionSerializer())
-					.registerTypeAdapter(Proof.class, new ProofSerializer())
-					.create();
-		}
+	private String identifier;
 
-		return gson;
+	public AttributeIdentifier() {
+		identifier = "";
+	}
+
+	public AttributeIdentifier(String value) throws IllegalArgumentException {
+		set(value);
+	}
+
+	public void set(String value) throws IllegalArgumentException {
+		if (value == null || value.equals(""))
+			throw new IllegalArgumentException("Invalid value: can't be null or empty");
+
+		int length = value.split("\\.").length;
+		if (length != 2 && length != 3)
+			throw new IllegalArgumentException("Invalid value: must contain 2 or 3 parts separated by a dot (value: "
+					+ value + ")");
+
+		identifier = value;
+	}
+
+	public String[] split() {
+		return identifier.split("\\.");
+	}
+
+	public String getIssuerName() {
+		return split()[0];
+	}
+
+	public String getCredentialName() {
+		return split()[1];
+	}
+
+	public String getAttributeName() {
+		if (!isCredential())
+			return split()[2];
+
+		return null;
+	}
+
+	public boolean isCredential() {
+		return split().length == 2;
+	}
+
+	@Override
+	public String toString() {
+		return identifier;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof AttributeIdentifier))
+			return false;
+
+		AttributeIdentifier i = (AttributeIdentifier) o;
+		return (this.identifier.equals(i.identifier));
+	}
+
+	@Override
+	public int hashCode() {
+		return identifier.hashCode();
 	}
 }

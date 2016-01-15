@@ -31,11 +31,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.verification.common.util;
+package org.irmacard.api.common.util;
 
 import com.google.gson.*;
-import org.irmacard.verification.common.AttributeDisjunction;
-import org.irmacard.verification.common.AttributeIdentifier;
+import org.irmacard.api.common.AttributeDisjunction;
+import org.irmacard.api.common.AttributeIdentifier;
 
 import java.lang.reflect.Type;
 

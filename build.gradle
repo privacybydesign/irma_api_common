@@ -2,8 +2,8 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 
-version = '0.1.5'
-group = 'org.irmacard.verification'
+version = '0.1.6'
+group = 'org.irmacard.api'
 
 repositories {
     mavenLocal()

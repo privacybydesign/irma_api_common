@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.verification.common;
+package org.irmacard.api.common;
 
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
@@ -43,8 +43,8 @@ import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.VerificationDescription;
-import org.irmacard.verification.common.util.GsonUtil;
-import org.irmacard.verification.common.DisclosureProofResult.Status;
+import org.irmacard.api.common.util.GsonUtil;
+import org.irmacard.api.common.DisclosureProofResult.Status;
 
 import java.io.Serializable;
 import java.math.BigInteger;

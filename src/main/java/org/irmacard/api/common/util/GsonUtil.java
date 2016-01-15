@@ -1,5 +1,5 @@
 /*
- * DisclosureProofStatus.java
+ * GsonUtil.java
  *
  * Copyright (c) 2015, Sietse Ringers, Radboud University
  * All rights reserved.
@@ -31,61 +31,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.verification.common;
+package org.irmacard.api.common.util;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.irmacard.api.common.AttributeDisjunction;
+import org.irmacard.credentials.idemix.proofs.Proof;
 
-@SuppressWarnings("unused")
-public class DisclosureProofResult {
-	public enum Status {
-		VALID,
-		INVALID,
-		EXPIRED,
-		WAITING,
-		MISSING_ATTRIBUTES
-	}
+public class GsonUtil {
+	private static Gson gson;
 
-	private Status status;
-	private Map<String, String> attributes;
-	private String data;
+	public static Gson getGson() {
+		if (gson == null) {
+			gson = new GsonBuilder()
+					.registerTypeAdapter(AttributeDisjunction.class, new AttributeDisjuctionSerializer())
+					.registerTypeAdapter(Proof.class, new ProofSerializer())
+					.create();
+		}
 
-	public DisclosureProofResult() {
-		status = Status.VALID;
-	}
-
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public void setStatus(Status status) {
-		this.status = status;
-
-		if (status != Status.VALID)
-			attributes = null;
-	}
-
-	public String getServiceProviderData() {
-		return data;
-	}
-
-	public void setServiceProviderData(String customData) {
-		this.data = customData;
-	}
-
-	public Map<String, Object> getAsMap() {
-		HashMap<String, Object> map = new HashMap<>(3);
-		map.put("status", status);
-		map.put("attributes", attributes);
-		map.put("jti", data);
-		return map;
+		return gson;
 	}
 }

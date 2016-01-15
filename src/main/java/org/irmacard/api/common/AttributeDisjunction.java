@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.verification.common;
+package org.irmacard.api.common;
 
 import java.util.ArrayList;
 

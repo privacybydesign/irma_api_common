@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Sietse Ringers
+ * Copyright (c) 2015, the IRMA Team
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,22 +28,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.verification.common;
+package org.irmacard.api.common.util;
 
-public class DisclosureQr {
-	private String u;
-	private String v;
+import com.google.gson.*;
+import org.irmacard.credentials.idemix.proofs.Proof;
+import org.irmacard.credentials.idemix.proofs.ProofD;
+import org.irmacard.credentials.idemix.proofs.ProofU;
 
-	public DisclosureQr(String version, String url) {
-		v = version;
-		u = url;
+import java.lang.reflect.Type;
+
+public class ProofSerializer implements JsonSerializer<Proof>, JsonDeserializer<Proof> {
+	@Override
+	public Proof deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+		JsonObject object = json.getAsJsonObject();
+		if (object.get("A") != null)
+			return context.deserialize(json, ProofD.class);
+		else if (object.get("U") != null)
+			return context.deserialize(json, ProofU.class);
+
+		throw new JsonParseException("Unrecognized proof type");
 	}
 
-	public String getVersion() {
-		return v;
-	}
+	@Override
+	public JsonElement serialize(Proof src, Type typeOfSrc, JsonSerializationContext context) {
+		if (src instanceof ProofD)
+			return context.serialize(src, ProofD.class);
+		else if (src instanceof ProofU)
+			return context.serialize(src, ProofU.class);
 
-	public String getUrl() {
-		return u;
+		return null;
 	}
 }

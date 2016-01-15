@@ -28,7 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.verification.common;
+package org.irmacard.api.common;
 
 public class ServiceProviderRequest {
 	private String data;

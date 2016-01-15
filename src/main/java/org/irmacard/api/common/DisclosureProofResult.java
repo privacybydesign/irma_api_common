@@ -1,5 +1,5 @@
 /*
- * AttributeIdentifier.java
+ * DisclosureProofStatus.java
  *
  * Copyright (c) 2015, Sietse Ringers, Radboud University
  * All rights reserved.
@@ -31,75 +31,61 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.verification.common;
+package org.irmacard.api.common;
 
-import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("unused")
-public class AttributeIdentifier implements Serializable {
-	private static final long serialVersionUID = 1158661160715464298L;
-
-	private String identifier;
-
-	public AttributeIdentifier() {
-		identifier = "";
+public class DisclosureProofResult {
+	public enum Status {
+		VALID,
+		INVALID,
+		EXPIRED,
+		WAITING,
+		MISSING_ATTRIBUTES
 	}
 
-	public AttributeIdentifier(String value) throws IllegalArgumentException {
-		set(value);
+	private Status status;
+	private Map<String, String> attributes;
+	private String data;
+
+	public DisclosureProofResult() {
+		status = Status.VALID;
 	}
 
-	public void set(String value) throws IllegalArgumentException {
-		if (value == null || value.equals(""))
-			throw new IllegalArgumentException("Invalid value: can't be null or empty");
-
-		int length = value.split("\\.").length;
-		if (length != 2 && length != 3)
-			throw new IllegalArgumentException("Invalid value: must contain 2 or 3 parts separated by a dot (value: "
-					+ value + ")");
-
-		identifier = value;
+	public Map<String, String> getAttributes() {
+		return attributes;
 	}
 
-	public String[] split() {
-		return identifier.split("\\.");
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
 	}
 
-	public String getIssuerName() {
-		return split()[0];
+	public Status getStatus() {
+		return status;
 	}
 
-	public String getCredentialName() {
-		return split()[1];
+	public void setStatus(Status status) {
+		this.status = status;
+
+		if (status != Status.VALID)
+			attributes = null;
 	}
 
-	public String getAttributeName() {
-		if (!isCredential())
-			return split()[2];
-
-		return null;
+	public String getServiceProviderData() {
+		return data;
 	}
 
-	public boolean isCredential() {
-		return split().length == 2;
+	public void setServiceProviderData(String customData) {
+		this.data = customData;
 	}
 
-	@Override
-	public String toString() {
-		return identifier;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (!(o instanceof AttributeIdentifier))
-			return false;
-
-		AttributeIdentifier i = (AttributeIdentifier) o;
-		return (this.identifier.equals(i.identifier));
-	}
-
-	@Override
-	public int hashCode() {
-		return identifier.hashCode();
+	public Map<String, Object> getAsMap() {
+		HashMap<String, Object> map = new HashMap<>(3);
+		map.put("status", status);
+		map.put("attributes", attributes);
+		map.put("jti", data);
+		return map;
 	}
 }
