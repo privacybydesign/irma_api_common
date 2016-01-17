@@ -144,9 +144,17 @@ public class DisclosureProofRequest extends SessionRequest {
 				if (disjunction == null || disjunction.isSatisfied())
 					continue;
 
-				disjunction.setSatisfied(true);
+				String attrValue = new String(proofD.getDisclosedAttributes().get(j).toByteArray());
+				if (!disjunction.hasValues())
+					disjunction.setSatisfied(true);
+				else {
+					AttributeIdentifier ai = new AttributeIdentifier(identifier);
+					String requiredValue = disjunction.getValues().get(ai);
+					if (requiredValue.equals(attrValue))
+						disjunction.setSatisfied(true);
+				}
 
-				String value = (j == 1) ? "present" : new String(proofD.getDisclosedAttributes().get(j).toByteArray());
+				String value = (j == 1) ? "present" : attrValue;
 				attributes.put(identifier, value);
 			}
 		}

@@ -34,12 +34,15 @@
 package org.irmacard.api.common;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 	private static final long serialVersionUID = -2053856356082434224L;
 
 	private String label;
+	private HashMap<AttributeIdentifier, String> values = new HashMap<>();
+
 	private transient AttributeIdentifier selected;
 	private transient boolean satisfied = false;
 
@@ -51,6 +54,14 @@ public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 		AttributeIdentifier ai = new AttributeIdentifier(value);
 		add(ai);
 		this.label = label;
+	}
+
+	public boolean hasValues() {
+		return values.size() > 0;
+	}
+
+	public HashMap<AttributeIdentifier, String> getValues() {
+		return values;
 	}
 
 	public String getLabel() {

@@ -38,19 +38,26 @@ import org.irmacard.api.common.AttributeDisjunction;
 import org.irmacard.api.common.AttributeIdentifier;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 
 public class AttributeDisjuctionSerializer
 		implements JsonSerializer<AttributeDisjunction>, JsonDeserializer<AttributeDisjunction> {
 	@Override
 	public JsonElement serialize(AttributeDisjunction src, Type typeOfSrc, JsonSerializationContext context) {
 		JsonObject object = new JsonObject();
-		JsonArray array = new JsonArray();
-
-		for (AttributeIdentifier identifier : src)
-			array.add(new JsonPrimitive(identifier.toString()));
-
-		object.add("attributes", array);
 		object.addProperty("label", src.getLabel());
+
+		if (src.hasValues()) { // Serialize it as a map
+			JsonObject map = new JsonObject();
+			for (AttributeIdentifier identifier : src)
+				map.addProperty(identifier.toString(), src.getValues().get(identifier));
+			object.add("attributes", map);
+		} else { // Serialize it as an array
+			JsonArray array = new JsonArray();
+			for (AttributeIdentifier identifier : src)
+				array.add(new JsonPrimitive(identifier.toString()));
+			object.add("attributes", array);
+		}
 
 		return object;
  	}
@@ -63,9 +70,21 @@ public class AttributeDisjuctionSerializer
 
 			AttributeDisjunction disjunction = new AttributeDisjunction(label);
 
-			JsonArray array = object.get("attributes").getAsJsonArray();
-			for (JsonElement el : array)
-				disjunction.add(new AttributeIdentifier(el.getAsString()));
+			JsonElement attributes = object.get("attributes");
+			if (attributes.isJsonArray()) {
+				JsonArray array = attributes.getAsJsonArray();
+				for (JsonElement el : array)
+					disjunction.add(new AttributeIdentifier(el.getAsString()));
+			} else if (attributes.isJsonObject()) {
+				JsonObject map = attributes.getAsJsonObject();
+				for (Map.Entry<String, JsonElement> entry : map.entrySet()) {
+					AttributeIdentifier ai = new AttributeIdentifier(entry.getKey());
+					disjunction.add(ai);
+					disjunction.getValues().put(ai, entry.getValue().getAsString());
+				}
+			} else {
+				throw new JsonParseException("No attribute values found");
+			}
 
 			return disjunction;
 		} catch (IllegalStateException|ClassCastException|NullPointerException e) {

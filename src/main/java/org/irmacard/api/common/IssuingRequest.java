@@ -9,6 +9,7 @@ public class IssuingRequest extends SessionRequest {
 	private static final long serialVersionUID = -1702838649530088365L;
 
 	private ArrayList<CredentialRequest> credentials;
+	private ArrayList<AttributeDisjunction> disclose = new ArrayList<>();
 
 	public IssuingRequest(BigInteger nonce, BigInteger context, ArrayList<CredentialRequest> credentials) {
 		super(nonce, context);
@@ -17,6 +18,10 @@ public class IssuingRequest extends SessionRequest {
 
 	public ArrayList<CredentialRequest> getCredentials() {
 		return credentials;
+	}
+
+	public ArrayList<AttributeDisjunction> getRequiredAttributes() {
+		return disclose;
 	}
 
 	/**
