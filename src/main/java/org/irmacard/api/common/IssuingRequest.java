@@ -5,31 +5,14 @@ import org.irmacard.credentials.info.CredentialDescription;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-public class IssuingRequest {
+public class IssuingRequest extends SessionRequest {
+	private static final long serialVersionUID = -1702838649530088365L;
+
 	private ArrayList<CredentialRequest> credentials;
-	private BigInteger nonce;
-	private BigInteger context;
 
 	public IssuingRequest(BigInteger nonce, BigInteger context, ArrayList<CredentialRequest> credentials) {
+		super(nonce, context);
 		this.credentials = credentials;
-		this.nonce = nonce;
-		this.context = context;
-	}
-
-	public BigInteger getNonce() {
-		return nonce;
-	}
-
-	public void setNonce(BigInteger nonce) {
-		this.nonce = nonce;
-	}
-
-	public BigInteger getContext() {
-		return context;
-	}
-
-	public void setContext(BigInteger context) {
-		this.context = context;
 	}
 
 	public ArrayList<CredentialRequest> getCredentials() {

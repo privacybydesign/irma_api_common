@@ -30,11 +30,11 @@
 
 package org.irmacard.api.common;
 
-public class DisclosureQr {
+public class ClientQr {
 	private String u;
 	private String v;
 
-	public DisclosureQr(String version, String url) {
+	public ClientQr(String version, String url) {
 		v = version;
 		u = url;
 	}

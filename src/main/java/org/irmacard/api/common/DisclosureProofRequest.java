@@ -51,16 +51,13 @@ import java.math.BigInteger;
 import java.util.*;
 
 @SuppressWarnings("unused")
-public class DisclosureProofRequest implements Serializable {
+public class DisclosureProofRequest extends SessionRequest {
 	private static final long serialVersionUID = 1016467840623150897L;
 
-	private BigInteger nonce;
-	private BigInteger context;
 	private List<AttributeDisjunction> content;
 
 	public DisclosureProofRequest(BigInteger nonce, BigInteger context, List<AttributeDisjunction> content) {
-		this.nonce = nonce;
-		this.context = context;
+		super(nonce, context);
 		this.content = content;
 	}
 
@@ -68,6 +65,10 @@ public class DisclosureProofRequest implements Serializable {
 	 * Generate a request from a VerificationDescription.
 	 */
 	public DisclosureProofRequest(VerificationDescription vd) {
+		super(
+				generateNonce(),
+				Crypto.sha256Hash(vd.toString().getBytes()) // See IdemixVerificationDescription.java
+		);
 		content = new ArrayList<>(4);
 
 		String issuer = vd.getIssuerID();
@@ -77,29 +78,10 @@ public class DisclosureProofRequest implements Serializable {
 		for (String name : cd.getAttributeNames())
 			if (vd.isDisclosed(name))
 				content.add(new AttributeDisjunction(name, issuer + "." + credential + "." + name));
-
-		context = Crypto.sha256Hash(vd.toString().getBytes()); // See IdemixVerificationDescription.java
-		nonce = generateNonce();
 	}
 
 	public List<AttributeDisjunction> getContent() {
 		return content;
-	}
-
-	public BigInteger getNonce() {
-		return nonce;
-	}
-
-	public void setNonce(BigInteger nonce) {
-		this.nonce = nonce;
-	}
-
-	public BigInteger getContext() {
-		return context;
-	}
-
-	public void setContext(BigInteger context) {
-		this.context = context;
 	}
 
 	public AttributeDisjunction find(String s) {
@@ -115,7 +97,7 @@ public class DisclosureProofRequest implements Serializable {
 		HashMap<String, String> attributes = new HashMap<>();
 		result.setAttributes(attributes);
 
-		if (!proofs.verify(context, nonce, true)) {
+		if (!proofs.verify(getContext(), getNonce(), true)) {
 			System.out.println("Proofs did not verify");
 			result.setStatus(Status.INVALID);
 			return result;
@@ -189,26 +171,5 @@ public class DisclosureProofRequest implements Serializable {
 		}
 
 		return credentials.size() == 1;
-	}
-
-	public static BigInteger generateNonce() {
-		return new BigInteger(new IdemixSystemParameters().l_statzk, new Random());
-	}
-
-	@Override
-	public String toString() {
-		return toString(true);
-	}
-
-	public String toString(boolean includeContext) {
-		BigInteger context = this.context;
-		if (!includeContext)
-			this.context = null;
-
-		String val = GsonUtil.getGson().toJson(this);
-
-		this.context = context;
-
-		return val;
 	}
 }
