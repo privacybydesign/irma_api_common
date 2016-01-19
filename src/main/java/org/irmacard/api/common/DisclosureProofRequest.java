@@ -135,6 +135,8 @@ public class DisclosureProofRequest extends SessionRequest {
 			String issuer = cd.getIssuerID();
 			String credName = cd.getCredentialID();
 
+			// For each of the disclosed attributes in this proof, see if they satisfy one of
+			// the AttributeDisjunctions that we asked for
 			for (int j : proofD.getDisclosedAttributes().keySet()) {
 				String attributeName = (j == 1) ? "" : "." + cd.getAttributeNames().get(j - 2);
 				String identifier = issuer + "." + credName + attributeName;
@@ -144,17 +146,18 @@ public class DisclosureProofRequest extends SessionRequest {
 				if (disjunction == null || disjunction.isSatisfied())
 					continue;
 
-				String attrValue = new String(proofD.getDisclosedAttributes().get(j).toByteArray());
+				String value = (j == 1) ? "present" : new String(proofD.getDisclosedAttributes().get(j).toByteArray());
 				if (!disjunction.hasValues())
 					disjunction.setSatisfied(true);
 				else {
+					// If the request indicated that the attribute should have a specific value, then the containing
+					// disjunction is only satisfied if the actual value of the attribute is correct.
 					AttributeIdentifier ai = new AttributeIdentifier(identifier);
 					String requiredValue = disjunction.getValues().get(ai);
-					if (requiredValue.equals(attrValue))
+					if (requiredValue.equals(value))
 						disjunction.setSatisfied(true);
 				}
 
-				String value = (j == 1) ? "present" : attrValue;
 				attributes.put(identifier, value);
 			}
 		}
