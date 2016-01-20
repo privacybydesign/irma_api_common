@@ -54,9 +54,9 @@ import java.util.*;
 public class DisclosureProofRequest extends SessionRequest {
 	private static final long serialVersionUID = 1016467840623150897L;
 
-	private ArrayList<AttributeDisjunction> content;
+	private AttributeDisjunctionList content;
 
-	public DisclosureProofRequest(BigInteger nonce, BigInteger context, ArrayList<AttributeDisjunction> content) {
+	public DisclosureProofRequest(BigInteger nonce, BigInteger context, AttributeDisjunctionList content) {
 		super(nonce, context);
 		this.content = content;
 	}
@@ -69,7 +69,7 @@ public class DisclosureProofRequest extends SessionRequest {
 				generateNonce(),
 				Crypto.sha256Hash(vd.toString().getBytes()) // See IdemixVerificationDescription.java
 		);
-		content = new ArrayList<>(4);
+		content = new AttributeDisjunctionList(4);
 
 		String issuer = vd.getIssuerID();
 		String credential = vd.getCredentialID();
@@ -80,16 +80,8 @@ public class DisclosureProofRequest extends SessionRequest {
 				content.add(new AttributeDisjunction(name, issuer + "." + credential + "." + name));
 	}
 
-	public ArrayList<AttributeDisjunction> getContent() {
+	public AttributeDisjunctionList getContent() {
 		return content;
-	}
-
-	public AttributeDisjunction find(String s) {
-		for (AttributeDisjunction disjuncion : content)
-			if (disjuncion.contains(s))
-				return disjuncion;
-
-		return null;
 	}
 
 	public DisclosureProofResult verify(ProofList proofs) throws InfoException {
@@ -142,7 +134,7 @@ public class DisclosureProofRequest extends SessionRequest {
 				String identifier = issuer + "." + credName + attributeName;
 
 				// See if this disclosed attribute occurs in one of our disjunctions
-				AttributeDisjunction disjunction = find(identifier);
+				AttributeDisjunction disjunction = content.find(identifier);
 				if (disjunction == null || disjunction.isSatisfied())
 					continue;
 
