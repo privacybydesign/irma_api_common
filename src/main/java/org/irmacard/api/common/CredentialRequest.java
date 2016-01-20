@@ -1,7 +1,6 @@
 package org.irmacard.api.common;
 
 import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
 import org.irmacard.credentials.info.CredentialDescription;
@@ -9,13 +8,16 @@ import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.IssuerDescription;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-public class CredentialRequest {
+public class CredentialRequest implements Serializable {
+	private static final long serialVersionUID = -8528619506484557225L;
+
 	private int validity = 6;
 	private String credential;
 	private HashMap<String, String> attributes;

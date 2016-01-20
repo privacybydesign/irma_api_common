@@ -1,7 +1,5 @@
 package org.irmacard.api.common;
 
-import org.irmacard.credentials.info.CredentialDescription;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 
@@ -21,6 +19,9 @@ public class IssuingRequest extends SessionRequest {
 	}
 
 	public ArrayList<AttributeDisjunction> getRequiredAttributes() {
+		if (disclose == null)
+			disclose = new ArrayList<>();
+
 		return disclose;
 	}
 

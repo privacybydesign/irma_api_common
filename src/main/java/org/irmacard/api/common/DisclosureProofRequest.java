@@ -54,9 +54,9 @@ import java.util.*;
 public class DisclosureProofRequest extends SessionRequest {
 	private static final long serialVersionUID = 1016467840623150897L;
 
-	private List<AttributeDisjunction> content;
+	private ArrayList<AttributeDisjunction> content;
 
-	public DisclosureProofRequest(BigInteger nonce, BigInteger context, List<AttributeDisjunction> content) {
+	public DisclosureProofRequest(BigInteger nonce, BigInteger context, ArrayList<AttributeDisjunction> content) {
 		super(nonce, context);
 		this.content = content;
 	}
@@ -80,7 +80,7 @@ public class DisclosureProofRequest extends SessionRequest {
 				content.add(new AttributeDisjunction(name, issuer + "." + credential + "." + name));
 	}
 
-	public List<AttributeDisjunction> getContent() {
+	public ArrayList<AttributeDisjunction> getContent() {
 		return content;
 	}
 
