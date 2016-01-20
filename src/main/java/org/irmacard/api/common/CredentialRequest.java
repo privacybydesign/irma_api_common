@@ -18,14 +18,29 @@ import java.util.List;
 public class CredentialRequest implements Serializable {
 	private static final long serialVersionUID = -8528619506484557225L;
 
-	private int validity = 6;
+	private long validity = getDefaultValidity();
 	private String credential;
 	private HashMap<String, String> attributes;
+
+	public CredentialRequest() {}
 
 	public CredentialRequest(int validity, String credential, HashMap<String, String> attributes) {
 		this.validity = validity;
 		this.credential = credential;
 		this.attributes = attributes;
+	}
+
+	private static long getDefaultValidity() {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, 6);
+		return floorValidityDate(cal.getTimeInMillis(), true);
+	}
+
+	private static long floorValidityDate(long timestamp, boolean isMillis) {
+		if (!isMillis)
+			timestamp *= 1000;
+
+		return (timestamp / Attributes.EXPIRY_FACTOR) * Attributes.EXPIRY_FACTOR / 1000;
 	}
 
 	public HashMap<String, String> getAttributes() {
@@ -44,12 +59,23 @@ public class CredentialRequest implements Serializable {
 		return credential.split("\\.")[1];
 	}
 
-	public int getValidity() {
+	public long getValidity() {
 		return validity;
+	}
+
+	public long getValidity(boolean floored) {
+		if (!floored)
+			return validity;
+		else
+			return floorValidityDate(validity, false);
 	}
 
 	public void setValidity(int validity) {
 		this.validity = validity;
+	}
+
+	public boolean isValidityFloored() {
+		return getValidity(false) == getValidity(true);
 	}
 
 	public CredentialDescription getCredentialDescription() throws InfoException {
@@ -93,6 +119,17 @@ public class CredentialRequest implements Serializable {
 	 * @throws InfoException If the attribute names do not match the ones from the description store
 	 */
 	public List<BigInteger> convertToBigIntegers() throws InfoException {
+		return convertToBigIntegers(true);
+	}
+
+	/**
+	 * Convert the attributes to BigIntegers, suitable for passing to the Idemix API.
+	 * @param floorValidity Whether or not to floor the validity date to an epoch boundary
+	 * @return The BigIntegers
+	 * @throws InfoException If the attribute names do not match the ones from the description store
+	 *
+	 */
+	public List<BigInteger> convertToBigIntegers(boolean floorValidity) throws InfoException {
 		if (!attributesMatchStore())
 			throw new InfoException("Incompatible credential types");
 
@@ -102,7 +139,7 @@ public class CredentialRequest implements Serializable {
 		attributes.setCredentialID(cd.getId());
 
 		Calendar expires = Calendar.getInstance();
-		expires.add(Calendar.MONTH, getValidity());
+		expires.setTimeInMillis(getValidity(floorValidity) * 1000);
 		attributes.setExpireDate(expires.getTime());
 
 		List<BigInteger> rawAttributes = new ArrayList<>();
