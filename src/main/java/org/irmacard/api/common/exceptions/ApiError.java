@@ -20,6 +20,7 @@ public enum ApiError {
 
 	// SP, IdP, or token errors
 	SESSION_UNKNOWN(400, "Unknown or expired session"),
+	SESSION_TOKEN_MALFORMED(400, "Malformed session token"),
 	MALFORMED_INPUT(400, "Input could not be parsed"),
 
 	// Token errors
