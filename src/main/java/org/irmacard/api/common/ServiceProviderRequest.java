@@ -30,23 +30,12 @@
 
 package org.irmacard.api.common;
 
-public class ServiceProviderRequest {
-	private String data;
+public class ServiceProviderRequest extends ClientRequest<DisclosureProofRequest> {
 	private int validity = 0;
-	private DisclosureProofRequest request;
 
 	public ServiceProviderRequest(String data, DisclosureProofRequest request, int validity) {
+		super(data, request);
 		this.validity = validity;
-		this.data = data;
-		this.request = request;
-	}
-
-	public DisclosureProofRequest getRequest() {
-		return request;
-	}
-
-	public String getServiceProviderData() {
-		return data;
 	}
 
 	public int getValidity() {
