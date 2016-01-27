@@ -34,6 +34,8 @@ public class ClientQr {
 	private String u;
 	private String v;
 
+	public ClientQr() {}
+
 	public ClientQr(String version, String url) {
 		v = version;
 		u = url;
@@ -43,7 +45,15 @@ public class ClientQr {
 		return v;
 	}
 
+	public void setVersion(String v) {
+		this.v = v;
+	}
+
 	public String getUrl() {
 		return u;
+	}
+
+	public void setUrl(String u) {
+		this.u = u;
 	}
 }
