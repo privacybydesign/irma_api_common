@@ -35,19 +35,51 @@ package org.irmacard.api.common.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.sf.scuba.smartcards.ProtocolCommand;
+import net.sf.scuba.smartcards.ProtocolResponse;
 import org.irmacard.api.common.AttributeDisjunction;
 import org.irmacard.credentials.idemix.proofs.Proof;
 
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Keeps a {@link Gson} instance to which type adapters can be added
+ * via {@link #addTypeAdapter(Class, Object)}.
+ */
 public class GsonUtil {
-	private static Gson gson;
+	protected static Gson gson;
+	private static boolean shouldReload;
+	private static HashMap<Class, Object> adapters = new HashMap<>();
+
+	// Put in the (de)serialisers that we know of
+	static {
+		adapters.put(byte[].class, new ByteArrayToBase64TypeAdapter());
+		adapters.put(AttributeDisjunction.class, new AttributeDisjuctionSerializer());
+		adapters.put(Proof.class, new ProofSerializer());
+		shouldReload = true;
+	}
+
+	private static void reload() {
+		GsonBuilder builder = new GsonBuilder();
+		for (Map.Entry<Class, Object> entry : adapters.entrySet())
+			builder.registerTypeAdapter(entry.getKey(), entry.getValue());
+
+		gson = builder.create();
+		shouldReload = false;
+	}
+
+	/**
+	 * Add the specified type adapter for the specified class.
+	 */
+	public static void addTypeAdapter(Class clazz, Object o) {
+		adapters.put(clazz, o);
+		shouldReload = true;
+	}
 
 	public static Gson getGson() {
-		if (gson == null) {
-			gson = new GsonBuilder()
-					.registerTypeAdapter(AttributeDisjunction.class, new AttributeDisjuctionSerializer())
-					.registerTypeAdapter(Proof.class, new ProofSerializer())
-					.create();
-		}
+		if (shouldReload)
+			reload();
 
 		return gson;
 	}
