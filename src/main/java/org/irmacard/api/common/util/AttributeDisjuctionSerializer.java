@@ -35,7 +35,7 @@ package org.irmacard.api.common.util;
 
 import com.google.gson.*;
 import org.irmacard.api.common.AttributeDisjunction;
-import org.irmacard.api.common.AttributeIdentifier;
+import org.irmacard.credentials.info.AttributeIdentifier;
 
 import java.lang.reflect.Type;
 import java.util.Map;

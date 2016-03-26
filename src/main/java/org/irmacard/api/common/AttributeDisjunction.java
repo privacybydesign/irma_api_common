@@ -33,6 +33,9 @@
 
 package org.irmacard.api.common;
 
+import org.irmacard.credentials.info.AttributeIdentifier;
+import org.irmacard.credentials.info.CredentialIdentifier;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -48,6 +51,11 @@ public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 
 	public AttributeDisjunction(String label) {
 		this.label = label;
+	}
+
+	public AttributeDisjunction(String label, AttributeIdentifier value) {
+		this.label = label;
+		add(value);
 	}
 
 	public AttributeDisjunction(String label, String value) {

@@ -1,7 +1,11 @@
 package org.irmacard.api.common;
 
+import org.irmacard.credentials.info.AttributeIdentifier;
+import org.irmacard.credentials.info.CredentialIdentifier;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class IssuingRequest extends SessionRequest {
 	private static final long serialVersionUID = -1702838649530088365L;
@@ -16,6 +20,20 @@ public class IssuingRequest extends SessionRequest {
 
 	public ArrayList<CredentialRequest> getCredentials() {
 		return credentials;
+	}
+
+	@Override
+	public HashSet<CredentialIdentifier> getCredentialList() {
+		HashSet<CredentialIdentifier> creds = new HashSet<>();
+
+		for (CredentialRequest cred : credentials)
+			creds.add(cred.getIdentifier());
+
+		for (AttributeDisjunction disjunction : getRequiredAttributes())
+			for (AttributeIdentifier attr : disjunction)
+				creds.add(attr.getCredentialIdentifier());
+
+		return creds;
 	}
 
 	public AttributeDisjunctionList getRequiredAttributes() {

@@ -33,22 +33,18 @@
 
 package org.irmacard.api.common;
 
-import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.idemix.IdemixSystemParameters;
-import org.irmacard.credentials.idemix.proofs.Proof;
-import org.irmacard.credentials.idemix.proofs.ProofList;
-import org.irmacard.credentials.idemix.proofs.ProofD;
-import org.irmacard.credentials.idemix.util.Crypto;
-import org.irmacard.credentials.info.CredentialDescription;
-import org.irmacard.credentials.info.DescriptionStore;
-import org.irmacard.credentials.info.InfoException;
-import org.irmacard.credentials.info.VerificationDescription;
-import org.irmacard.api.common.util.GsonUtil;
 import org.irmacard.api.common.DisclosureProofResult.Status;
+import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.idemix.proofs.Proof;
+import org.irmacard.credentials.idemix.proofs.ProofD;
+import org.irmacard.credentials.idemix.proofs.ProofList;
+import org.irmacard.credentials.idemix.util.Crypto;
+import org.irmacard.credentials.info.*;
 
-import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 public class DisclosureProofRequest extends SessionRequest {
@@ -77,11 +73,22 @@ public class DisclosureProofRequest extends SessionRequest {
 		CredentialDescription cd = vd.getCredentialDescription();
 		for (String name : cd.getAttributeNames())
 			if (vd.isDisclosed(name))
-				content.add(new AttributeDisjunction(name, issuer + "." + credential + "." + name));
+				content.add(new AttributeDisjunction(name, new AttributeIdentifier(vd.getCredentialIdentifier(), name)));
 	}
 
 	public AttributeDisjunctionList getContent() {
 		return content;
+	}
+
+	@Override
+	public HashSet<CredentialIdentifier> getCredentialList() {
+		HashSet<CredentialIdentifier> credentials = new HashSet<>();
+
+		for (AttributeDisjunction disjunction : content)
+			for (AttributeIdentifier attr : disjunction)
+				credentials.add(attr.getCredentialIdentifier());
+
+		return credentials;
 	}
 
 	public DisclosureProofResult verify(ProofList proofs) throws InfoException {
@@ -124,14 +131,12 @@ public class DisclosureProofRequest extends SessionRequest {
 				result.setStatus(Status.MISSING_ATTRIBUTES);
 				return result;
 			}
-			String issuer = cd.getIssuerID();
-			String credName = cd.getCredentialID();
 
 			// For each of the disclosed attributes in this proof, see if they satisfy one of
 			// the AttributeDisjunctions that we asked for
 			for (int j : proofD.getDisclosedAttributes().keySet()) {
 				String attributeName = (j == 1) ? "" : "." + cd.getAttributeNames().get(j - 2);
-				String identifier = issuer + "." + credName + attributeName;
+				String identifier = cd.getIdentifier() + attributeName;
 
 				// See if this disclosed attribute occurs in one of our disjunctions
 				AttributeDisjunction disjunction = content.find(identifier);

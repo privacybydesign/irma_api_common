@@ -3,11 +3,13 @@ package org.irmacard.api.common;
 import org.irmacard.api.common.util.GsonUtil;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
 import org.irmacard.credentials.idemix.util.Crypto;
+import org.irmacard.credentials.info.CredentialIdentifier;
+import org.irmacard.credentials.info.IssuerIdentifier;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.HashSet;
 
 public abstract class SessionRequest implements Serializable {
 	private static final long serialVersionUID = -1765381227944439300L;
@@ -18,6 +20,17 @@ public abstract class SessionRequest implements Serializable {
 	public SessionRequest(BigInteger nonce, BigInteger context) {
 		this.nonce = nonce;
 		this.context = context;
+	}
+
+	public abstract HashSet<CredentialIdentifier> getCredentialList();
+
+	public HashSet<IssuerIdentifier> getIssuerList() {
+		HashSet<IssuerIdentifier> issuers = new HashSet<>();
+
+		for (CredentialIdentifier credential : getCredentialList())
+			issuers.add(credential.getIssuerIdentifier());
+
+		return issuers;
 	}
 
 	public BigInteger getNonce() {

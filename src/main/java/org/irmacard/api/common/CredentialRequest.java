@@ -3,10 +3,7 @@ package org.irmacard.api.common;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
-import org.irmacard.credentials.info.CredentialDescription;
-import org.irmacard.credentials.info.DescriptionStore;
-import org.irmacard.credentials.info.InfoException;
-import org.irmacard.credentials.info.IssuerDescription;
+import org.irmacard.credentials.info.*;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -21,6 +18,7 @@ public class CredentialRequest implements Serializable {
 	private long validity = getDefaultValidity();
 	private String credential;
 	private HashMap<String, String> attributes;
+	private transient CredentialIdentifier identifier;
 
 	public CredentialRequest() {}
 
@@ -51,12 +49,19 @@ public class CredentialRequest implements Serializable {
 		return credential;
 	}
 
+	public CredentialIdentifier getIdentifier() {
+		if (identifier == null)
+			identifier = new CredentialIdentifier(credential);
+
+		return identifier;
+	}
+
 	public String getIssuerName() {
-		return credential.split("\\.")[0];
+		return getIdentifier().getIssuerName();
 	}
 
 	public String getCredentialName() {
-		return credential.split("\\.")[1];
+		return getIdentifier().getCredentialName();
 	}
 
 	public long getValidity() {
@@ -79,16 +84,15 @@ public class CredentialRequest implements Serializable {
 	}
 
 	public CredentialDescription getCredentialDescription() throws InfoException {
-		return DescriptionStore.getInstance().getCredentialDescriptionByName(
-				getIssuerName(), getCredentialName());
+		return getIdentifier().getCredentialDescription();
 	}
 
-	public IssuerDescription getIssuerDescription() throws InfoException {
-		return DescriptionStore.getInstance().getIssuerDescription(getIssuerName());
+	public IssuerDescription getIssuerDescription() {
+		return getIdentifier().getIssuerIdentifier().getIssuerDescription();
 	}
 
 	public IdemixPublicKey getPublicKey() throws InfoException {
-		return IdemixKeyStore.getInstance().getPublicKey(getIssuerName());
+		return IdemixKeyStore.getInstance().getPublicKey(getIssuerDescription());
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package org.irmacard.api.common;
 
 import org.irmacard.api.common.AttributeDisjunction;
+import org.irmacard.credentials.info.AttributeIdentifier;
 
 import java.io.Serializable;
 import java.util.ArrayList;
