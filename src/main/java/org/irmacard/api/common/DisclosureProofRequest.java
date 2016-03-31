@@ -57,25 +57,6 @@ public class DisclosureProofRequest extends SessionRequest {
 		this.content = content;
 	}
 
-	/**
-	 * Generate a request from a VerificationDescription.
-	 */
-	public DisclosureProofRequest(VerificationDescription vd) {
-		super(
-				generateNonce(),
-				Crypto.sha256Hash(vd.toString().getBytes()) // See IdemixVerificationDescription.java
-		);
-		content = new AttributeDisjunctionList(4);
-
-		String issuer = vd.getIssuerID();
-		String credential = vd.getCredentialID();
-
-		CredentialDescription cd = vd.getCredentialDescription();
-		for (String name : cd.getAttributeNames())
-			if (vd.isDisclosed(name))
-				content.add(new AttributeDisjunction(name, new AttributeIdentifier(vd.getCredentialIdentifier(), name)));
-	}
-
 	public AttributeDisjunctionList getContent() {
 		return content;
 	}
