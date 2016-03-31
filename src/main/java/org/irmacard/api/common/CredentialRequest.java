@@ -16,13 +16,12 @@ public class CredentialRequest implements Serializable {
 	private static final long serialVersionUID = -8528619506484557225L;
 
 	private long validity = getDefaultValidity();
-	private String credential;
+	private CredentialIdentifier credential;
 	private HashMap<String, String> attributes;
-	private transient CredentialIdentifier identifier;
 
 	public CredentialRequest() {}
 
-	public CredentialRequest(int validity, String credential, HashMap<String, String> attributes) {
+	public CredentialRequest(int validity, CredentialIdentifier credential, HashMap<String, String> attributes) {
 		this.validity = validity;
 		this.credential = credential;
 		this.attributes = attributes;
@@ -46,14 +45,11 @@ public class CredentialRequest implements Serializable {
 	}
 
 	public String getFullName() {
-		return credential;
+		return credential.toString();
 	}
 
 	public CredentialIdentifier getIdentifier() {
-		if (identifier == null)
-			identifier = new CredentialIdentifier(credential);
-
-		return identifier;
+		return credential;
 	}
 
 	public String getIssuerName() {

@@ -39,6 +39,8 @@ import net.sf.scuba.smartcards.ProtocolCommand;
 import net.sf.scuba.smartcards.ProtocolResponse;
 import org.irmacard.api.common.AttributeDisjunction;
 import org.irmacard.credentials.idemix.proofs.Proof;
+import org.irmacard.credentials.info.CredentialIdentifier;
+import org.irmacard.credentials.info.ObjectIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +59,7 @@ public class GsonUtil {
 		adapters.put(byte[].class, new ByteArrayToBase64TypeAdapter());
 		adapters.put(AttributeDisjunction.class, new AttributeDisjuctionSerializer());
 		adapters.put(Proof.class, new ProofSerializer());
+		adapters.put(CredentialIdentifier.class, new CredentialIdentifierSerializer());
 		shouldReload = true;
 	}
 
@@ -65,6 +68,7 @@ public class GsonUtil {
 		for (Map.Entry<Class, Object> entry : adapters.entrySet())
 			builder.registerTypeAdapter(entry.getKey(), entry.getValue());
 
+		builder.enableComplexMapKeySerialization();
 		gson = builder.create();
 		shouldReload = false;
 	}
