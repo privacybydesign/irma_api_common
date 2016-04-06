@@ -133,23 +133,19 @@ public class CredentialRequest implements Serializable {
 		if (!attributesMatchStore())
 			throw new InfoException("Incompatible credential types");
 
-		CredentialDescription cd = getCredentialDescription();
-
-		Attributes attributes = new Attributes();
-		attributes.setCredentialID(cd.getId());
-
+		Attributes attributesObject = new Attributes();
+		attributesObject.setSigningDate(Calendar.getInstance().getTime());
+		attributesObject.setCredentialIdentifier(getIdentifier());
+		attributesObject.setKeyCounter(1);
 		Calendar expires = Calendar.getInstance();
 		expires.setTimeInMillis(getValidity(floorValidity) * 1000);
-		attributes.setExpireDate(expires.getTime());
+		attributesObject.setExpiryDate(expires.getTime());
 
-		List<BigInteger> rawAttributes = new ArrayList<>();
-		rawAttributes.add(new BigInteger(1, attributes.get(Attributes.META_DATA_FIELD)));
-
-		for(int i = 0; i < cd.getAttributeNames().size(); i++) {
-			String attrname = cd.getAttributeNames().get(i);
-			rawAttributes.add(new BigInteger(1, getAttributes().get(attrname).getBytes()));
+		for (String name : attributes.keySet()) {
+			attributesObject.add(name, attributes.get(name).getBytes());
 		}
 
-		return rawAttributes;
+		List<BigInteger> bigints = attributesObject.toBigIntegers();
+		return bigints;
 	}
 }

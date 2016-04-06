@@ -88,43 +88,46 @@ public class DisclosureProofRequest extends SessionRequest {
 				continue;
 
 			ProofD proofD = (ProofD) proof;
-
-			// Check presence of metadata attribute
-			if (proofD.getDisclosedAttributes().get(1) == null) {
+			Attributes disclosed;
+			try {
+				disclosed = new Attributes(proofD.getDisclosedAttributes());
+			} catch (IllegalArgumentException e) {
 				System.out.println("Metadata attribute missing");
 				result.setStatus(Status.INVALID);
 				return result;
 			}
 
 			// Verify validity, extract credential id from metadata attribute
-			BigInteger metadata = proofD.getDisclosedAttributes().get(1);
-			short id = Attributes.extractCredentialId(metadata);
-			if (!Attributes.isValid(metadata)) {
+			if (!disclosed.isValid()) {
 				result.setStatus(Status.EXPIRED);
 				return result;
 			}
 
-			CredentialDescription cd = DescriptionStore.getInstance().getCredentialDescription(id);
-			if (cd == null) {
-				// If the id was not found in DescriptionStore, then whatever attributes are contained in the proof belong
-				// to a credential type we don't know.
-				System.out.println("CredentialDescription not found");
+			CredentialIdentifier credId = disclosed.getCredentialIdentifier();
+			if (credId == null) {
+				System.out.println("Received unknown credential type");
 				result.setStatus(Status.MISSING_ATTRIBUTES);
 				return result;
 			}
 
 			// For each of the disclosed attributes in this proof, see if they satisfy one of
 			// the AttributeDisjunctions that we asked for
-			for (int j : proofD.getDisclosedAttributes().keySet()) {
-				String attributeName = (j == 1) ? "" : "." + cd.getAttributeNames().get(j - 2);
-				String identifier = cd.getIdentifier() + attributeName;
+			for (String attributeName : disclosed.getIdentifiers()) {
+				String identifier;
+				String value;
+				if (attributeName != Attributes.META_DATA_FIELD) {
+					identifier = credId.toString() + "." + attributeName;
+					value = new String(disclosed.get(attributeName));
+				} else {
+					identifier = credId.toString();
+					value = "present";
+				}
 
 				// See if this disclosed attribute occurs in one of our disjunctions
 				AttributeDisjunction disjunction = content.find(identifier);
 				if (disjunction == null || disjunction.isSatisfied())
 					continue;
 
-				String value = (j == 1) ? "present" : new String(proofD.getDisclosedAttributes().get(j).toByteArray());
 				if (!disjunction.hasValues())
 					disjunction.setSatisfied(true);
 				else {
