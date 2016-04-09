@@ -3,11 +3,13 @@ package org.irmacard.api.common;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
-import org.irmacard.credentials.info.*;
+import org.irmacard.credentials.info.CredentialDescription;
+import org.irmacard.credentials.info.CredentialIdentifier;
+import org.irmacard.credentials.info.InfoException;
+import org.irmacard.credentials.info.IssuerDescription;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +18,7 @@ public class CredentialRequest implements Serializable {
 	private static final long serialVersionUID = -8528619506484557225L;
 
 	private long validity = getDefaultValidity();
+	private int keyCounter;
 	private CredentialIdentifier credential;
 	private HashMap<String, String> attributes;
 
@@ -79,6 +82,14 @@ public class CredentialRequest implements Serializable {
 		return getValidity(false) == getValidity(true);
 	}
 
+	public int getKeyCounter() {
+		return keyCounter;
+	}
+
+	public void setKeyCounter(int keyCounter) {
+		this.keyCounter = keyCounter;
+	}
+
 	public CredentialDescription getCredentialDescription() throws InfoException {
 		return getIdentifier().getCredentialDescription();
 	}
@@ -88,7 +99,7 @@ public class CredentialRequest implements Serializable {
 	}
 
 	public IdemixPublicKey getPublicKey() throws InfoException {
-		return IdemixKeyStore.getInstance().getPublicKey(getIssuerDescription());
+		return IdemixKeyStore.getInstance().getPublicKey(getIdentifier().getIssuerIdentifier(), keyCounter);
 	}
 
 	/**
@@ -127,7 +138,6 @@ public class CredentialRequest implements Serializable {
 	 * @param floorValidity Whether or not to floor the validity date to an epoch boundary
 	 * @return The BigIntegers
 	 * @throws InfoException If the attribute names do not match the ones from the description store
-	 *
 	 */
 	public List<BigInteger> convertToBigIntegers(boolean floorValidity) throws InfoException {
 		if (!attributesMatchStore())
@@ -145,7 +155,6 @@ public class CredentialRequest implements Serializable {
 			attributesObject.add(name, attributes.get(name).getBytes());
 		}
 
-		List<BigInteger> bigints = attributesObject.toBigIntegers();
-		return bigints;
+		return attributesObject.toBigIntegers();
 	}
 }

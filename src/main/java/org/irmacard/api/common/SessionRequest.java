@@ -9,6 +9,7 @@ import org.irmacard.credentials.info.IssuerIdentifier;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public abstract class SessionRequest implements Serializable {
@@ -23,6 +24,8 @@ public abstract class SessionRequest implements Serializable {
 	}
 
 	public abstract HashSet<CredentialIdentifier> getCredentialList();
+
+	public abstract HashMap<IssuerIdentifier, Integer> getPublicKeyList();
 
 	public HashSet<IssuerIdentifier> getIssuerList() {
 		HashSet<IssuerIdentifier> issuers = new HashSet<>();

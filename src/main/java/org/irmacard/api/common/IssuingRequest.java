@@ -2,9 +2,11 @@ package org.irmacard.api.common;
 
 import org.irmacard.credentials.info.AttributeIdentifier;
 import org.irmacard.credentials.info.CredentialIdentifier;
+import org.irmacard.credentials.info.IssuerIdentifier;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class IssuingRequest extends SessionRequest {
@@ -34,6 +36,16 @@ public class IssuingRequest extends SessionRequest {
 				creds.add(attr.getCredentialIdentifier());
 
 		return creds;
+	}
+
+	@Override
+	public HashMap<IssuerIdentifier, Integer> getPublicKeyList() {
+		HashMap<IssuerIdentifier, Integer> map = new HashMap<>();
+
+		for (CredentialRequest cred : credentials)
+			map.put(cred.getIdentifier().getIssuerIdentifier(), cred.getKeyCounter());
+
+		return map;
 	}
 
 	public AttributeDisjunctionList getRequiredAttributes() {

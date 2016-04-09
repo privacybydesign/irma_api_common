@@ -38,8 +38,10 @@ import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.proofs.Proof;
 import org.irmacard.credentials.idemix.proofs.ProofD;
 import org.irmacard.credentials.idemix.proofs.ProofList;
-import org.irmacard.credentials.idemix.util.Crypto;
-import org.irmacard.credentials.info.*;
+import org.irmacard.credentials.info.AttributeIdentifier;
+import org.irmacard.credentials.info.CredentialIdentifier;
+import org.irmacard.credentials.info.InfoException;
+import org.irmacard.credentials.info.IssuerIdentifier;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -70,6 +72,11 @@ public class DisclosureProofRequest extends SessionRequest {
 				credentials.add(attr.getCredentialIdentifier());
 
 		return credentials;
+	}
+
+	@Override
+	public HashMap<IssuerIdentifier, Integer> getPublicKeyList() {
+		return new HashMap<>();
 	}
 
 	public DisclosureProofResult verify(ProofList proofs) throws InfoException {
@@ -115,7 +122,7 @@ public class DisclosureProofRequest extends SessionRequest {
 			for (String attributeName : disclosed.getIdentifiers()) {
 				String identifier;
 				String value;
-				if (attributeName != Attributes.META_DATA_FIELD) {
+				if (!attributeName.equals(Attributes.META_DATA_FIELD)) {
 					identifier = credId.toString() + "." + attributeName;
 					value = new String(disclosed.get(attributeName));
 				} else {
