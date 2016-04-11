@@ -146,7 +146,7 @@ public class CredentialRequest implements Serializable {
 		Attributes attributesObject = new Attributes();
 		attributesObject.setSigningDate(Calendar.getInstance().getTime());
 		attributesObject.setCredentialIdentifier(getIdentifier());
-		attributesObject.setKeyCounter(1);
+		attributesObject.setKeyCounter(getKeyCounter());
 		Calendar expires = Calendar.getInstance();
 		expires.setTimeInMillis(getValidity(floorValidity) * 1000);
 		attributesObject.setExpiryDate(expires.getTime());
