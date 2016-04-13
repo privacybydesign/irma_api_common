@@ -1,5 +1,7 @@
 package org.irmacard.api.common;
 
+import org.irmacard.api.common.exceptions.ApiError;
+import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
@@ -14,6 +16,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class CredentialRequest implements Serializable {
 	private static final long serialVersionUID = -8528619506484557225L;
 
@@ -110,8 +113,11 @@ public class CredentialRequest implements Serializable {
 		try {
 			cd = getCredentialDescription();
 		} catch (InfoException e) {
-			return false;
+			throw new ApiException(ApiError.EXCEPTION, e.getMessage());
 		}
+
+		if (cd == null)
+			return false;
 
 		List<String> storeAttributes = cd.getAttributeNames();
 		if (storeAttributes.size() != getAttributes().size())

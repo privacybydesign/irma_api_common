@@ -12,6 +12,7 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.HashSet;
 
+@SuppressWarnings("unused")
 public abstract class SessionRequest implements Serializable {
 	private static final long serialVersionUID = -1765381227944439300L;
 

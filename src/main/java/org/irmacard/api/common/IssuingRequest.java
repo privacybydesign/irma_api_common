@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+@SuppressWarnings("unused")
 public class IssuingRequest extends SessionRequest {
 	private static final long serialVersionUID = -1702838649530088365L;
 

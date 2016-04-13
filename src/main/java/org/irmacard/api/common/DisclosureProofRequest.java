@@ -34,6 +34,7 @@
 package org.irmacard.api.common;
 
 import org.irmacard.api.common.DisclosureProofResult.Status;
+import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.proofs.Proof;
 import org.irmacard.credentials.idemix.proofs.ProofD;
@@ -77,6 +78,14 @@ public class DisclosureProofRequest extends SessionRequest {
 	@Override
 	public HashMap<IssuerIdentifier, Integer> getPublicKeyList() {
 		return new HashMap<>();
+	}
+
+	public boolean attributesMatchStore() throws ApiException {
+		for (AttributeDisjunction disjunction : getContent())
+			if (!disjunction.attributesMatchStore())
+				return false;
+
+		return true;
 	}
 
 	public DisclosureProofResult verify(ProofList proofs) throws InfoException {

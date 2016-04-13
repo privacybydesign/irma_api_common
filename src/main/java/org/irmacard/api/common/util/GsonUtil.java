@@ -42,6 +42,7 @@ import org.irmacard.credentials.idemix.proofs.Proof;
 import org.irmacard.credentials.info.CredentialIdentifier;
 import org.irmacard.credentials.info.ObjectIdentifier;
 
+import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +70,7 @@ public class GsonUtil {
 			builder.registerTypeAdapter(entry.getKey(), entry.getValue());
 
 		builder.enableComplexMapKeySerialization();
+		builder.setDateFormat(DateFormat.LONG, DateFormat.LONG);
 		gson = builder.create();
 		shouldReload = false;
 	}

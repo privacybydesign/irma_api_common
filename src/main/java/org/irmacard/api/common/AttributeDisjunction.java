@@ -33,8 +33,9 @@
 
 package org.irmacard.api.common;
 
-import org.irmacard.credentials.info.AttributeIdentifier;
-import org.irmacard.credentials.info.CredentialIdentifier;
+import org.irmacard.api.common.exceptions.ApiError;
+import org.irmacard.api.common.exceptions.ApiException;
+import org.irmacard.credentials.info.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,5 +105,26 @@ public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 	public int indexOf(String s) {
 		AttributeIdentifier i = new AttributeIdentifier(s);
 		return indexOf(i);
+	}
+
+	public boolean attributesMatchStore() throws ApiException {
+		DescriptionStore ds;
+		try {
+			ds = DescriptionStore.getInstance();
+		} catch (InfoException e) {
+			throw new ApiException(ApiError.EXCEPTION, e.getMessage());
+		}
+
+		for (AttributeIdentifier attribute : this) {
+			CredentialDescription cd = ds.getCredentialDescription(attribute.getCredentialIdentifier());
+			if (cd == null)
+				return false;
+
+			String attrName = attribute.getAttributeName();
+			if (attrName != null && !cd.getAttributeNames().contains(attrName))
+				return false;
+		}
+
+		return true;
 	}
 }
