@@ -30,13 +30,13 @@
 
 package org.irmacard.api.common;
 
-public class ServiceProviderRequest extends ClientRequest<DisclosureProofRequest> {
+public class ServiceProviderRequest<T extends DisclosureRequest> extends ClientRequest<T> {
 	public final static String JWT_SUBJECT = "verification_request";
 	public final static String JWT_REQUEST_KEY = "sprequest";
 
 	private int validity = 0;
 
-	public ServiceProviderRequest(String data, DisclosureProofRequest request, int validity) {
+	public ServiceProviderRequest(String data, T request, int validity) {
 		super(data, request);
 		this.validity = validity;
 	}

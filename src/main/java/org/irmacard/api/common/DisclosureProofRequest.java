@@ -33,188 +33,21 @@
 
 package org.irmacard.api.common;
 
-import org.irmacard.api.common.DisclosureProofResult.Status;
-import org.irmacard.api.common.exceptions.ApiException;
-import org.irmacard.credentials.Attributes;
+
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
-import org.irmacard.credentials.idemix.proofs.Proof;
-import org.irmacard.credentials.idemix.proofs.ProofD;
-import org.irmacard.credentials.idemix.proofs.ProofList;
-import org.irmacard.credentials.info.*;
+import org.irmacard.credentials.info.AttributeIdentifier;
+import org.irmacard.credentials.info.KeyException;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+
 
 @SuppressWarnings("unused")
-public class DisclosureProofRequest extends SessionRequest {
+public class DisclosureProofRequest extends DisclosureRequest {
 	private static final long serialVersionUID = 1016467840623150897L;
 
-	private AttributeDisjunctionList content;
-
 	public DisclosureProofRequest(BigInteger nonce, BigInteger context, AttributeDisjunctionList content) {
-		super(nonce, context);
-		this.content = content;
-	}
-
-	public AttributeDisjunctionList getContent() {
-		return content;
-	}
-
-	@Override
-	public HashSet<CredentialIdentifier> getCredentialList() {
-		HashSet<CredentialIdentifier> credentials = new HashSet<>();
-
-		for (AttributeDisjunction disjunction : content)
-			for (AttributeIdentifier attr : disjunction)
-				credentials.add(attr.getCredentialIdentifier());
-
-		return credentials;
-	}
-
-	@Override
-	public HashMap<IssuerIdentifier, Integer> getPublicKeyList() {
-		return new HashMap<>();
-	}
-
-	@Override
-	public IdemixSystemParameters getLargestParameters() {
-		IdemixSystemParameters params = null;
-
-		for (AttributeDisjunction disjunction : getContent()) {
-			for (AttributeIdentifier identifier : disjunction) {
-
-				try {
-					IdemixPublicKey pk = IdemixKeyStore.getInstance()
-							.getLatestPublicKey(identifier.getIssuerIdentifier());
-					if (params == null || params.get_l_n() < pk.getBitsize())
-						params = pk.getSystemParameters();
-				} catch (KeyException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-
-		return params;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return content == null || content.size() == 0;
-	}
-
-	public boolean attributesMatchStore() throws ApiException {
-		for (AttributeDisjunction disjunction : getContent())
-			if (!disjunction.attributesMatchStore())
-				return false;
-
-		return true;
-	}
-
-	public DisclosureProofResult verify(ProofList proofs) throws InfoException, KeyException {
-		DisclosureProofResult result = new DisclosureProofResult(); // Our return object
-		HashMap<String, String> attributes = new HashMap<>();
-
-		ArrayList<CredentialIdentifier> credentialTypes = new ArrayList<>(proofs.size());
-
-		if (!proofs.verify(getContext(), getNonce(), true)) {
-			System.out.println("Proofs did not verify");
-			result.setStatus(Status.INVALID);
-			return result;
-		}
-
-		for (Proof proof : proofs) {
-			if (!(proof instanceof ProofD))
-				continue;
-
-			ProofD proofD = (ProofD) proof;
-			Attributes disclosed;
-			try {
-				disclosed = new Attributes(proofD.getDisclosedAttributes());
-			} catch (IllegalArgumentException e) {
-				System.out.println("Metadata attribute missing");
-				result.setStatus(Status.INVALID);
-				return result;
-			}
-
-			// Verify validity, extract credential id from metadata attribute
-			if (!disclosed.isValid()) {
-				result.setStatus(Status.EXPIRED);
-				return result;
-			}
-
-			CredentialIdentifier credId = disclosed.getCredentialIdentifier();
-			if (credId == null) {
-				System.out.println("Received unknown credential type");
-				result.setStatus(Status.MISSING_ATTRIBUTES);
-				return result;
-			}
-
-			// If this proof contains attributes coming from a credential type we have already
-			// seen in another proof, then return invalid
-			if (credentialTypes.contains(credId)) {
-				result.setStatus(Status.INVALID);
-				return result;
-			}
-			credentialTypes.add(credId);
-
-			// For each of the disclosed attributes in this proof, see if they satisfy one of
-			// the AttributeDisjunctions that we asked for
-			for (String attributeName : disclosed.getIdentifiers()) {
-				String identifier;
-				String value;
-				if (!attributeName.equals(Attributes.META_DATA_FIELD)) {
-					identifier = credId.toString() + "." + attributeName;
-					value = new String(disclosed.get(attributeName));
-				} else {
-					identifier = credId.toString();
-					value = "present";
-				}
-
-				// See if this disclosed attribute occurs in one of our disjunctions
-				AttributeDisjunction disjunction = content.find(identifier);
-				if (disjunction == null || disjunction.isSatisfied())
-					continue;
-
-				if (!disjunction.hasValues())
-					disjunction.setSatisfied(true);
-				else {
-					// If the request indicated that the attribute should have a specific value, then the containing
-					// disjunction is only satisfied if the actual value of the attribute is correct.
-					AttributeIdentifier ai = new AttributeIdentifier(identifier);
-					String requiredValue = disjunction.getValues().get(ai);
-					if (requiredValue.equals(value))
-						disjunction.setSatisfied(true);
-				}
-
-				attributes.put(identifier, value);
-			}
-		}
-
-		for (AttributeDisjunction disjunction : content)
-			if (!disjunction.isSatisfied())
-				result.setStatus(Status.MISSING_ATTRIBUTES);
-
-		result.setAttributes(attributes);
-		return result;
-	}
-
-	/**
-	 * Returns true if the request contains no disjunctions, and asks for attributes of a single credential type
-	 */
-	public boolean isSimple() {
-		Set<String> credentials = new HashSet<>();
-
-		for (AttributeDisjunction d : content) {
-			if (d.size() > 1)
-				return false;
-			credentials.add(d.get(0).getCredentialName());
-		}
-
-		return credentials.size() == 1;
+		super(nonce, context, content);
 	}
 }
