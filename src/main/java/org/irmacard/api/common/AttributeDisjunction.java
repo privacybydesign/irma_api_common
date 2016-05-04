@@ -34,10 +34,12 @@
 package org.irmacard.api.common;
 
 import org.irmacard.api.common.exceptions.ApiException;
+import org.irmacard.api.common.util.GsonUtil;
 import org.irmacard.credentials.info.AttributeIdentifier;
 import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.DescriptionStore;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -120,6 +122,27 @@ public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 				return false;
 		}
 
+		return true;
+	}
+
+	/**
+	 * Used in unit test
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (other == null || this.getClass() != other.getClass()) {
+			return false;
+		}
+		AttributeDisjunction aother = (AttributeDisjunction) other;
+		if (!getLabel().equals(aother.getLabel()) || size() != aother.size()) {
+			return false;
+		}
+
+		for (int i = 0; i < size(); i++) {
+			if (! get(i).equals(aother.get(i))) {
+				return false;
+			}
+		}
 		return true;
 	}
 }

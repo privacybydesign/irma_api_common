@@ -37,7 +37,9 @@ package org.irmacard.api.common;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
+import org.irmacard.credentials.idemix.proofs.ProofList;
 import org.irmacard.credentials.info.AttributeIdentifier;
+import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.KeyException;
 
 import java.math.BigInteger;
@@ -49,5 +51,10 @@ public class DisclosureProofRequest extends DisclosureRequest {
 
 	public DisclosureProofRequest(BigInteger nonce, BigInteger context, AttributeDisjunctionList content) {
 		super(nonce, context, content);
+	}
+
+	@Override
+	public DisclosureProofResult verify(ProofList proofs) throws InfoException, KeyException {
+		return super.verify(proofs, getNonce());
 	}
 }

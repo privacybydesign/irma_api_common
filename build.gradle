@@ -28,7 +28,7 @@ artifacts {
 dependencies {
     compile "com.google.code.gson:gson:2.2.2"
     compile 'io.jsonwebtoken:jjwt:0.6.0'
-    compile "org.irmacard.credentials:credentials_idemix:0.16.0"
+    compile "org.irmacard.credentials:credentials_idemix:0.17.0"
 
     testCompile "junit:junit:4.11"
 }

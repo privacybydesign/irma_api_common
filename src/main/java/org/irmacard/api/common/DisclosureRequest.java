@@ -117,13 +117,14 @@ public abstract class DisclosureRequest extends SessionRequest {
 		return content == null || content.size() == 0;
 	}
 
-	// TODO: move to subclass?
-	public DisclosureProofResult verify(ProofList proofs) throws InfoException, KeyException {
+	public abstract DisclosureProofResult verify(ProofList proofs) throws InfoException, KeyException;
+
+	protected DisclosureProofResult verify(ProofList proofs, BigInteger nonce) throws InfoException, KeyException {
 		DisclosureProofResult result = new DisclosureProofResult(); // Our return object
 		HashMap<String, String> attributes = new HashMap<>();
 		result.setAttributes(attributes);
 
-		if (!proofs.verify(getContext(), getNonce(), true)) {
+		if (!proofs.verify(getContext(), nonce, true)) {
 			System.out.println("Proofs did not verify");
 			result.setStatus(Status.INVALID);
 			return result;

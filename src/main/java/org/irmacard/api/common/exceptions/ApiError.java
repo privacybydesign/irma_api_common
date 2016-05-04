@@ -13,6 +13,7 @@ public enum ApiError {
 
 	// SP-specific errors
 	MALFORMED_VERIFIER_REQUEST(400, "Malformed verification request"),
+	MALFORMED_SIGNATURE_REQUEST(400, "Malformed signature request"),
 
 	// Token errors
 	INVALID_PROOFS(400, "Invalid secret key commitments and/or disclosure proofs"),
