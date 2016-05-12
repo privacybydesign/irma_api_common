@@ -35,8 +35,6 @@ package org.irmacard.api.common.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.sf.scuba.smartcards.ProtocolCommand;
-import net.sf.scuba.smartcards.ProtocolResponse;
 import org.irmacard.api.common.AttributeDisjunction;
 import org.irmacard.credentials.idemix.proofs.Proof;
 import org.irmacard.credentials.info.CredentialIdentifier;
