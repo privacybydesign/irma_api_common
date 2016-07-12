@@ -1,7 +1,12 @@
 package org.irmacard.api.common;
 
+import org.irmacard.credentials.idemix.IdemixPublicKey;
+import org.irmacard.credentials.idemix.IdemixSystemParameters;
+import org.irmacard.credentials.idemix.IdemixSystemParameters1024;
+import org.irmacard.credentials.idemix.info.IdemixKeyStore;
 import org.irmacard.credentials.info.AttributeIdentifier;
 import org.irmacard.credentials.info.CredentialIdentifier;
+import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.IssuerIdentifier;
 
 import java.math.BigInteger;
@@ -54,6 +59,31 @@ public class IssuingRequest extends SessionRequest {
 			disclose = new AttributeDisjunctionList();
 
 		return disclose;
+	}
+
+	@Override
+	public IdemixSystemParameters getLargestParameters() {
+		IdemixSystemParameters largest = null;
+
+		for (CredentialRequest cred : credentials) {
+			try {
+				if (largest == null || largest.get_l_n() < cred.getPublicKey().getBitsize())
+					largest = cred.getPublicKey().getSystemParameters();
+
+				for (AttributeDisjunction d : getRequiredAttributes()) {
+					for (AttributeIdentifier ai : d) {
+						IdemixPublicKey pk = IdemixKeyStore.getInstance().getLatestPublicKey(ai.getIssuerIdentifier());
+						if (largest.get_l_n() < pk.getBitsize())
+							largest = pk.getSystemParameters();
+					}
+				}
+
+			} catch (InfoException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		return largest;
 	}
 
 	/**

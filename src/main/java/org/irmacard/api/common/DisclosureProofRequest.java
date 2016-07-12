@@ -36,6 +36,9 @@ package org.irmacard.api.common;
 import org.irmacard.api.common.DisclosureProofResult.Status;
 import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.idemix.IdemixPublicKey;
+import org.irmacard.credentials.idemix.IdemixSystemParameters;
+import org.irmacard.credentials.idemix.info.IdemixKeyStore;
 import org.irmacard.credentials.idemix.proofs.Proof;
 import org.irmacard.credentials.idemix.proofs.ProofD;
 import org.irmacard.credentials.idemix.proofs.ProofList;
@@ -78,6 +81,27 @@ public class DisclosureProofRequest extends SessionRequest {
 	@Override
 	public HashMap<IssuerIdentifier, Integer> getPublicKeyList() {
 		return new HashMap<>();
+	}
+
+	@Override
+	public IdemixSystemParameters getLargestParameters() {
+		IdemixSystemParameters params = null;
+
+		for (AttributeDisjunction disjunction : getContent()) {
+			for (AttributeIdentifier identifier : disjunction) {
+
+				try {
+					IdemixPublicKey pk = IdemixKeyStore.getInstance()
+							.getLatestPublicKey(identifier.getIssuerIdentifier());
+					if (params == null || params.get_l_n() < pk.getBitsize())
+						params = pk.getSystemParameters();
+				} catch (InfoException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+
+		return params;
 	}
 
 	public boolean attributesMatchStore() throws ApiException {

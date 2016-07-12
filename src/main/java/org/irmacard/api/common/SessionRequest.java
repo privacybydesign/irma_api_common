@@ -28,6 +28,8 @@ public abstract class SessionRequest implements Serializable {
 
 	public abstract HashMap<IssuerIdentifier, Integer> getPublicKeyList();
 
+	public abstract IdemixSystemParameters getLargestParameters();
+
 	public HashSet<IssuerIdentifier> getIssuerList() {
 		HashSet<IssuerIdentifier> issuers = new HashSet<>();
 
@@ -53,8 +55,8 @@ public abstract class SessionRequest implements Serializable {
 		this.context = context;
 	}
 
-	public static BigInteger generateNonce() {
-		return new BigInteger(new IdemixSystemParameters().l_statzk, new SecureRandom());
+	public static BigInteger generateNonce(IdemixSystemParameters params) {
+		return new BigInteger(params.get_l_statzk(), new SecureRandom());
 	}
 
 	public BigInteger generateContext() {
@@ -62,7 +64,7 @@ public abstract class SessionRequest implements Serializable {
 	}
 
 	public void setNonceAndContext() {
-		this.nonce = generateNonce();
+		this.nonce = generateNonce(getLargestParameters());
 		this.context = generateContext();
 	}
 
