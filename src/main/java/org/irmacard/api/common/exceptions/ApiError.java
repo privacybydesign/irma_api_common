@@ -2,7 +2,7 @@ package org.irmacard.api.common.exceptions;
 
 /**
  * Errors that can occur in usage of the API, along with their HTTP status code
- * and human-readable descriptions. For use in {@link ApiError} and {@link ApiException}.
+ * and human-readable descriptions. For use in {@link ApiErrorMessage} and {@link ApiException}.
  */
 @SuppressWarnings("unused")
 public enum ApiError {
@@ -19,6 +19,7 @@ public enum ApiError {
 	ATTRIBUTES_MISSING(400, "Not all requested-for attributes were present"),
 	ATTRIBUTES_EXPIRED(400, "Disclosed attributes were expired"),
 	UNEXPECTED_REQUEST(403, "Unexpected request in this state"),
+	UNKNOWN_PUBLIC_KEY(403, "Attributes were not valid against a known public key"),
 
 	// IdP or SP errors
 	JWT_INVALID(401, "JSON web token did not verify"),
