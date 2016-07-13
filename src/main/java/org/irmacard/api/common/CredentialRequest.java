@@ -5,10 +5,7 @@ import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
-import org.irmacard.credentials.info.CredentialDescription;
-import org.irmacard.credentials.info.CredentialIdentifier;
-import org.irmacard.credentials.info.InfoException;
-import org.irmacard.credentials.info.IssuerDescription;
+import org.irmacard.credentials.info.*;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -101,7 +98,7 @@ public class CredentialRequest implements Serializable {
 		return getIdentifier().getIssuerIdentifier().getIssuerDescription();
 	}
 
-	public IdemixPublicKey getPublicKey() throws InfoException {
+	public IdemixPublicKey getPublicKey() throws KeyException {
 		return IdemixKeyStore.getInstance().getPublicKey(getIdentifier().getIssuerIdentifier(), keyCounter);
 	}
 

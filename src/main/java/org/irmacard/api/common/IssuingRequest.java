@@ -2,12 +2,11 @@ package org.irmacard.api.common;
 
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
-import org.irmacard.credentials.idemix.IdemixSystemParameters1024;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
 import org.irmacard.credentials.info.AttributeIdentifier;
 import org.irmacard.credentials.info.CredentialIdentifier;
-import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.IssuerIdentifier;
+import org.irmacard.credentials.info.KeyException;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ public class IssuingRequest extends SessionRequest {
 					}
 				}
 
-			} catch (InfoException e) {
+			} catch (KeyException e) {
 				throw new RuntimeException(e);
 			}
 		}

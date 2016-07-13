@@ -42,10 +42,7 @@ import org.irmacard.credentials.idemix.info.IdemixKeyStore;
 import org.irmacard.credentials.idemix.proofs.Proof;
 import org.irmacard.credentials.idemix.proofs.ProofD;
 import org.irmacard.credentials.idemix.proofs.ProofList;
-import org.irmacard.credentials.info.AttributeIdentifier;
-import org.irmacard.credentials.info.CredentialIdentifier;
-import org.irmacard.credentials.info.InfoException;
-import org.irmacard.credentials.info.IssuerIdentifier;
+import org.irmacard.credentials.info.*;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -95,7 +92,7 @@ public class DisclosureProofRequest extends SessionRequest {
 							.getLatestPublicKey(identifier.getIssuerIdentifier());
 					if (params == null || params.get_l_n() < pk.getBitsize())
 						params = pk.getSystemParameters();
-				} catch (InfoException e) {
+				} catch (KeyException e) {
 					throw new RuntimeException(e);
 				}
 			}
@@ -112,7 +109,7 @@ public class DisclosureProofRequest extends SessionRequest {
 		return true;
 	}
 
-	public DisclosureProofResult verify(ProofList proofs) throws InfoException {
+	public DisclosureProofResult verify(ProofList proofs) throws InfoException, KeyException {
 		DisclosureProofResult result = new DisclosureProofResult(); // Our return object
 		HashMap<String, String> attributes = new HashMap<>();
 		result.setAttributes(attributes);
