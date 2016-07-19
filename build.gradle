@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 
-version = '0.3.9'
+version = '0.3.10'
 group = 'org.irmacard.api'
 
 repositories {
@@ -24,7 +24,7 @@ artifacts {
 
 dependencies {
     compile "com.google.code.gson:gson:2.2.2"
-    compile "org.irmacard.credentials:credentials_idemix:0.14.0"
+    compile "org.irmacard.credentials:credentials_idemix:0.14.1"
 
     testCompile "junit:junit:4.11"
 }
