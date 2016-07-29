@@ -45,6 +45,7 @@ import org.irmacard.credentials.idemix.proofs.ProofList;
 import org.irmacard.credentials.info.*;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -112,7 +113,8 @@ public class DisclosureProofRequest extends SessionRequest {
 	public DisclosureProofResult verify(ProofList proofs) throws InfoException, KeyException {
 		DisclosureProofResult result = new DisclosureProofResult(); // Our return object
 		HashMap<String, String> attributes = new HashMap<>();
-		result.setAttributes(attributes);
+
+		ArrayList<CredentialIdentifier> credentialTypes = new ArrayList<>(proofs.size());
 
 		if (!proofs.verify(getContext(), getNonce(), true)) {
 			System.out.println("Proofs did not verify");
@@ -146,6 +148,14 @@ public class DisclosureProofRequest extends SessionRequest {
 				result.setStatus(Status.MISSING_ATTRIBUTES);
 				return result;
 			}
+
+			// If this proof contains attributes coming from a credential type we have already
+			// seen in another proof, then return invalid
+			if (credentialTypes.contains(credId)) {
+				result.setStatus(Status.INVALID);
+				return result;
+			}
+			credentialTypes.add(credId);
 
 			// For each of the disclosed attributes in this proof, see if they satisfy one of
 			// the AttributeDisjunctions that we asked for
@@ -184,6 +194,7 @@ public class DisclosureProofRequest extends SessionRequest {
 			if (!disjunction.isSatisfied())
 				result.setStatus(Status.MISSING_ATTRIBUTES);
 
+		result.setAttributes(attributes);
 		return result;
 	}
 
