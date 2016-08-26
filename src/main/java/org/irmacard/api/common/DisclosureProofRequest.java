@@ -102,6 +102,11 @@ public class DisclosureProofRequest extends SessionRequest {
 		return params;
 	}
 
+	@Override
+	public boolean isEmpty() {
+		return content == null || content.size() == 0;
+	}
+
 	public boolean attributesMatchStore() throws ApiException {
 		for (AttributeDisjunction disjunction : getContent())
 			if (!disjunction.attributesMatchStore())

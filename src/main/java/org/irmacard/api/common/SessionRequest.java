@@ -30,6 +30,8 @@ public abstract class SessionRequest implements Serializable {
 
 	public abstract IdemixSystemParameters getLargestParameters();
 
+	public abstract boolean isEmpty();
+
 	public HashSet<IssuerIdentifier> getIssuerList() {
 		HashSet<IssuerIdentifier> issuers = new HashSet<>();
 

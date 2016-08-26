@@ -85,6 +85,11 @@ public class IssuingRequest extends SessionRequest {
 		return largest;
 	}
 
+	@Override
+	public boolean isEmpty() {
+		return credentials == null || credentials.size() == 0;
+	}
+
 	/**
 	 * Checks if the amount and names of the attributes of all containing credentials match those from the
 	 * description store.

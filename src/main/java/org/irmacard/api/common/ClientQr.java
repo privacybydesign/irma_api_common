@@ -33,6 +33,7 @@ package org.irmacard.api.common;
 public class ClientQr {
 	private String u;
 	private String v;
+	private String vmax;
 
 	public ClientQr() {}
 
@@ -41,12 +42,26 @@ public class ClientQr {
 		u = url;
 	}
 
+	public ClientQr(String version, String maxVersion, String url) {
+		u = url;
+		v = version;
+		vmax = maxVersion;
+	}
+
 	public String getVersion() {
 		return v;
 	}
 
 	public void setVersion(String v) {
 		this.v = v;
+	}
+
+	public String getMaxVersion() {
+		return vmax;
+	}
+
+	public void setMaxVersion(String vmax) {
+		this.vmax = vmax;
 	}
 
 	public String getUrl() {
