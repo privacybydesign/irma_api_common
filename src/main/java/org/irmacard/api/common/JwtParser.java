@@ -22,6 +22,7 @@ public class JwtParser <T extends ClientRequest<?>> {
 
 	private Claims claims;
 	private T payload;
+	private boolean authenticated = false;
 
 	/**
 	 * Construct a new parser.
@@ -56,14 +57,26 @@ public class JwtParser <T extends ClientRequest<?>> {
 	}
 
 	private Claims getSignedClaims(String jwt) {
-		return Jwts.parser()
+		Claims claims = Jwts.parser()
 				.requireSubject(subject)
 				.setSigningKeyResolver(keyResolver)
 				.parseClaimsJws(jwt)
 				.getBody();
+
+		// If we're here then parseClaimsJws() did not throw an exception, so the signature verified
+		authenticated = true;
+
+		return claims;
 	}
 
 	private Claims getUnsignedClaims(String jwt) {
+		// If the JWT contains two dots, then the final part is a signature that we don't care about
+		int i = jwt.lastIndexOf('.');
+		if (jwt.indexOf('.') != i) {
+			System.out.println("Warning: discarding JWT signature!");
+			jwt = jwt.substring(0, i + 1);
+		}
+
 		return Jwts.parser()
 				.requireSubject(subject)
 				.parseClaimsJwt(jwt)
@@ -74,28 +87,23 @@ public class JwtParser <T extends ClientRequest<?>> {
 	 * Parse the specified String as a JWT, checking its age, and its signature if necessary.
 	 * @param jwt The JWT
 	 * @return The claims contained in the JWT
-	 * @throws ApiException If there was no signature but there needed to be; if the signature did not
-	 *                      verify; if the JWT was too old; or if the specified string could not be
+	 * @throws ApiException If there was no valid signature but there needed to be;
+	 *                      if the JWT was too old; or if the specified string could not be
 	 *                      parsed as a JWT
 	 */
 	public Claims getClaims(String jwt) throws ApiException {
 		Claims claims;
 
 		try {
-			if (!allowUnsigned) { // Has to be signed, only try as signed JWT
-				System.out.println("Trying signed JWT");
-				claims = getSignedClaims(jwt);
-			} else { // First try to parse it as an unsigned JWT; if that fails, try it as a signed JWT
-				try {
-					System.out.println("Trying unsigned JWT");
-					claims = getUnsignedClaims(jwt);
-				} catch (UnsupportedJwtException e) {
-					claims = getSignedClaims(jwt);
-				}
+			System.out.println("Trying signed JWT");
+			claims = getSignedClaims(jwt);
+		} catch (Exception e) {
+			if (allowUnsigned) {
+				System.out.println("Trying unsigned JWT");
+				claims = getUnsignedClaims(jwt);
+			} else {
+				throw new ApiException(ApiError.JWT_INVALID);
 			}
-		} catch (UnsupportedJwtException|MalformedJwtException|SignatureException
-				|ExpiredJwtException|IllegalArgumentException e) {
-			throw new ApiException(ApiError.JWT_INVALID);
 		}
 
 		long now = Calendar.getInstance().getTimeInMillis();
@@ -151,5 +159,16 @@ public class JwtParser <T extends ClientRequest<?>> {
 
 	public void setKeyResolver(SigningKeyResolver keyResolver) {
 		this.keyResolver = keyResolver;
+	}
+
+	/**
+	 * Returns true if the JWT has a signature that has been succesfully verified.
+	 * @throws IllegalStateException if no JWT has yet been parsed
+	 */
+	public boolean isAuthenticated() {
+		if (payload == null)
+			throw new IllegalStateException("No JWT parsed yet");
+
+		return authenticated;
 	}
 }
