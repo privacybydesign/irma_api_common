@@ -38,6 +38,7 @@ public class SignatureProofRequest extends DisclosureRequest {
         DisclosureProofResult d = super.verify(proofs, getChallenge());
 
         result.setStatus(d.getStatus());
+        result.setAttributes(d.getAttributes());
         return result;
     }
 
