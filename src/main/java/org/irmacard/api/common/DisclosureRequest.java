@@ -170,6 +170,8 @@ public abstract class DisclosureRequest extends SessionRequest {
 					value = "present";
 				}
 
+				attributes.put(identifier, value);
+
 				// See if this disclosed attribute occurs in one of our disjunctions
 				AttributeDisjunction disjunction = content.find(identifier);
 				if (disjunction == null || disjunction.isSatisfied())
@@ -185,8 +187,6 @@ public abstract class DisclosureRequest extends SessionRequest {
 					if (requiredValue.equals(value))
 						disjunction.setSatisfied(true);
 				}
-
-				attributes.put(identifier, value);
 			}
 		}
 
