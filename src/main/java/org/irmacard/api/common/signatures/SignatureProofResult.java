@@ -1,7 +1,8 @@
-package org.irmacard.api.common;
+package org.irmacard.api.common.signatures;
 
-import org.irmacard.api.common.util.GsonUtil;
-import org.irmacard.api.common.SignatureProofRequest.MessageType;
+import org.irmacard.api.common.AttributeBasedSignature;
+import org.irmacard.api.common.disclosure.DisclosureProofResult;
+import org.irmacard.api.common.signatures.SignatureProofRequest.MessageType;
 import org.irmacard.credentials.idemix.proofs.ProofList;
 
 import java.math.BigInteger;

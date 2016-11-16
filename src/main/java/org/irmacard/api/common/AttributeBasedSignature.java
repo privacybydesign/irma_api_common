@@ -1,15 +1,12 @@
 package org.irmacard.api.common;
 
-import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.idemix.proofs.Proof;
-import org.irmacard.credentials.idemix.proofs.ProofD;
+import org.irmacard.api.common.signatures.SignatureProofRequest;
+import org.irmacard.api.common.signatures.SignatureProofResult;
 import org.irmacard.credentials.idemix.proofs.ProofList;
-import org.irmacard.credentials.info.AttributeIdentifier;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.KeyException;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.Map;
 
 public class AttributeBasedSignature {

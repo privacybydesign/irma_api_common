@@ -28,7 +28,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.api.common;
+package org.irmacard.api.common.disclosure;
+
+import org.irmacard.api.common.ClientRequest;
 
 public class ServiceProviderRequest extends ClientRequest<DisclosureProofRequest> {
 	public final static String JWT_SUBJECT = "verification_request";

@@ -33,7 +33,8 @@
 
 package org.irmacard.api.common;
 
-import org.irmacard.api.common.DisclosureProofResult.Status;
+import org.irmacard.api.common.disclosure.DisclosureProofResult;
+import org.irmacard.api.common.disclosure.DisclosureProofResult.Status;
 import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.IdemixPublicKey;

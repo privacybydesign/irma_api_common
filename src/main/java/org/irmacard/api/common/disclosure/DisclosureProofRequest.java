@@ -1,5 +1,5 @@
 /*
- * DisclosureProofStatus.java
+ * DisclosureProofRequest.java
  *
  * Copyright (c) 2015, Sietse Ringers, Radboud University
  * All rights reserved.
@@ -31,61 +31,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.irmacard.api.common;
+package org.irmacard.api.common.disclosure;
 
-import java.util.HashMap;
-import java.util.Map;
+
+import org.irmacard.api.common.AttributeDisjunctionList;
+import org.irmacard.api.common.DisclosureRequest;
+import org.irmacard.credentials.idemix.proofs.ProofList;
+import org.irmacard.credentials.info.InfoException;
+import org.irmacard.credentials.info.KeyException;
+
+import java.math.BigInteger;
+
 
 @SuppressWarnings("unused")
-public class DisclosureProofResult {
-	public enum Status {
-		VALID,
-		INVALID,
-		EXPIRED,
-		WAITING,
-		MISSING_ATTRIBUTES
+public class DisclosureProofRequest extends DisclosureRequest {
+	private static final long serialVersionUID = 1016467840623150897L;
+
+	public DisclosureProofRequest(BigInteger nonce, BigInteger context, AttributeDisjunctionList content) {
+		super(nonce, context, content);
 	}
 
-	private Status status;
-	private Map<String, String> attributes;
-	private String data;
-
-	public DisclosureProofResult() {
-		status = Status.VALID;
-	}
-
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public void setStatus(Status status) {
-		this.status = status;
-
-		if (status != Status.VALID)
-			attributes = null;
-	}
-
-	public String getServiceProviderData() {
-		return data;
-	}
-
-	public void setServiceProviderData(String customData) {
-		this.data = customData;
-	}
-
-	public Map<String, Object> getAsMap() {
-		HashMap<String, Object> map = new HashMap<>(3);
-		map.put("status", status);
-		map.put("attributes", attributes);
-		map.put("jti", data);
-		return map;
+	@Override
+	public DisclosureProofResult verify(ProofList proofs) throws InfoException, KeyException {
+		return super.verify(proofs, getNonce());
 	}
 }

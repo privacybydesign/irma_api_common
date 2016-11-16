@@ -1,5 +1,9 @@
-package org.irmacard.api.common;
+package org.irmacard.api.common.issuing;
 
+import org.irmacard.api.common.AttributeDisjunction;
+import org.irmacard.api.common.AttributeDisjunctionList;
+import org.irmacard.api.common.CredentialRequest;
+import org.irmacard.api.common.SessionRequest;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;

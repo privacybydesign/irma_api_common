@@ -1,4 +1,6 @@
-package org.irmacard.api.common;
+package org.irmacard.api.common.issuing;
+
+import org.irmacard.api.common.ClientRequest;
 
 public class IdentityProviderRequest extends ClientRequest<IssuingRequest> {
 	public final static String JWT_SUBJECT = "issue_request";

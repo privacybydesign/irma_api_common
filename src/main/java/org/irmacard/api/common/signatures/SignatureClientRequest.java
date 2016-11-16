@@ -1,4 +1,6 @@
-package org.irmacard.api.common;
+package org.irmacard.api.common.signatures;
+
+import org.irmacard.api.common.ClientRequest;
 
 public class SignatureClientRequest extends ClientRequest<SignatureProofRequest> {
 	public final static String JWT_SUBJECT = "signature_request";

@@ -1,19 +1,14 @@
-package org.irmacard.api.common;
+package org.irmacard.api.common.signatures;
 
-import org.irmacard.credentials.Attributes;
-import org.irmacard.credentials.idemix.proofs.Proof;
-import org.irmacard.credentials.idemix.proofs.ProofD;
+import org.irmacard.api.common.AttributeDisjunctionList;
+import org.irmacard.api.common.DisclosureRequest;
+import org.irmacard.api.common.disclosure.DisclosureProofResult;
 import org.irmacard.credentials.idemix.proofs.ProofList;
 import org.irmacard.credentials.idemix.util.Crypto;
-import org.irmacard.credentials.info.AttributeIdentifier;
-import org.irmacard.credentials.info.CredentialIdentifier;
 import org.irmacard.credentials.info.InfoException;
-import org.irmacard.api.common.DisclosureProofResult.Status;
 import org.irmacard.credentials.info.KeyException;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
 
 @SuppressWarnings("unused")
 public class SignatureProofRequest extends DisclosureRequest {
