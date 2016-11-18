@@ -11,7 +11,7 @@ public class CredentialIdentifierSerializer  implements JsonSerializer<Credentia
 	public CredentialIdentifier deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 		try {
 			return new CredentialIdentifier(json.getAsJsonPrimitive().getAsString());
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException|IllegalStateException e) {
 			throw new JsonParseException(e);
 		}
 	}

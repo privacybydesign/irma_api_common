@@ -2,7 +2,9 @@ package org.irmacard.api.common;
 
 import org.irmacard.api.common.signatures.SignatureProofRequest;
 import org.irmacard.api.common.signatures.SignatureProofResult;
+import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.proofs.ProofList;
+import org.irmacard.credentials.info.AttributeIdentifier;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.KeyException;
 
@@ -14,8 +16,7 @@ public class AttributeBasedSignature {
 	private BigInteger nonce;
 	private BigInteger context;
 
-	private transient Map<String, String> attributes;
-	private transient String message;
+	private transient Map<AttributeIdentifier, String> attributes;
 
 	public AttributeBasedSignature(ProofList proofs, BigInteger nonce, BigInteger context) {
 		this.proofs = proofs;
@@ -23,9 +24,9 @@ public class AttributeBasedSignature {
 		this.context = context;
 	}
 
-	public Map<String, String> getAttributes() {
+	public Map<AttributeIdentifier, String> getAttributes() throws IllegalArgumentException, CredentialsException {
 		if (attributes == null)
-			throw new IllegalStateException("Run .verify(String) first");
+			attributes = proofs.getAttributes();
 
 		return attributes;
 	}

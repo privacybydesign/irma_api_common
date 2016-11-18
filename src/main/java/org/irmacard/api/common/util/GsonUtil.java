@@ -37,6 +37,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.irmacard.api.common.AttributeDisjunction;
 import org.irmacard.credentials.idemix.proofs.Proof;
+import org.irmacard.credentials.info.AttributeIdentifier;
 import org.irmacard.credentials.info.CredentialIdentifier;
 import org.irmacard.credentials.info.ObjectIdentifier;
 
@@ -59,6 +60,7 @@ public class GsonUtil {
 		adapters.put(AttributeDisjunction.class, new AttributeDisjuctionSerializer());
 		adapters.put(Proof.class, new ProofSerializer());
 		adapters.put(CredentialIdentifier.class, new CredentialIdentifierSerializer());
+		adapters.put(AttributeIdentifier.class, new AttributeIdentifierSerializer());
 		shouldReload = true;
 	}
 

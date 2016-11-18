@@ -3,6 +3,7 @@ package org.irmacard.api.common.signatures;
 import org.irmacard.api.common.AttributeDisjunctionList;
 import org.irmacard.api.common.DisclosureRequest;
 import org.irmacard.api.common.disclosure.DisclosureProofResult;
+import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.proofs.ProofList;
 import org.irmacard.credentials.idemix.util.Crypto;
 import org.irmacard.credentials.info.InfoException;
@@ -31,9 +32,17 @@ public class SignatureProofRequest extends DisclosureRequest {
         SignatureProofResult result = new SignatureProofResult(proofs, this); // Our return object
 
         DisclosureProofResult d = super.verify(proofs, getChallenge());
-
         result.setStatus(d.getStatus());
-        result.setAttributes(d.getAttributes());
+
+        if (d.getStatus() == DisclosureProofResult.Status.VALID) {
+            try {
+                result.setAttributes(proofs.getAttributes());
+            } catch (CredentialsException e) {
+                // Will not happen; in this case d.getStatus() would not be VALID
+                throw new InfoException(e);
+            }
+        }
+
         return result;
     }
 

@@ -37,6 +37,7 @@ import org.irmacard.api.common.disclosure.DisclosureProofResult;
 import org.irmacard.api.common.disclosure.DisclosureProofResult.Status;
 import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
@@ -122,7 +123,7 @@ public abstract class DisclosureRequest extends SessionRequest {
 
 	protected DisclosureProofResult verify(ProofList proofs, BigInteger nonce) throws InfoException, KeyException {
 		DisclosureProofResult result = new DisclosureProofResult(); // Our return object
-		HashMap<String, String> attributes = new HashMap<>();
+		HashMap<AttributeIdentifier, String> attributes = new HashMap<>();
 		result.setAttributes(attributes);
 
 		if (!proofs.verify(getContext(), nonce, true)) {
@@ -131,62 +132,38 @@ public abstract class DisclosureRequest extends SessionRequest {
 			return result;
 		}
 
-		for (Proof proof : proofs) {
-			if (!(proof instanceof ProofD))
-				continue;
+		HashMap<AttributeIdentifier, String> foundAttrs;
+		try {
+			foundAttrs =  proofs.getAttributes();
+		} catch (CredentialsException e) {
+			System.out.println("Received expired credential");
+			result.setStatus(Status.EXPIRED);
+			return result;
+		} catch (IllegalArgumentException e) {
+			System.out.println("Metadata attribute missing, or unknown credential type");
+			result.setStatus(Status.INVALID);
+			return result;
+		}
 
-			ProofD proofD = (ProofD) proof;
-			Attributes disclosed;
-			try {
-				disclosed = new Attributes(proofD.getDisclosedAttributes());
-			} catch (IllegalArgumentException e) {
-				System.out.println("Metadata attribute missing");
-				result.setStatus(Status.INVALID);
-				return result;
-			}
-
-			// Verify validity, extract credential id from metadata attribute
-			if (!disclosed.isValid()) {
-				result.setStatus(Status.EXPIRED);
-				return result;
-			}
-
-			CredentialIdentifier credId = disclosed.getCredentialIdentifier();
-			if (credId == null) {
-				System.out.println("Received unknown credential type");
-				result.setStatus(Status.MISSING_ATTRIBUTES);
-				return result;
-			}
-
+		for (AttributeIdentifier ai : foundAttrs.keySet()) {
 			// For each of the disclosed attributes in this proof, see if they satisfy one of
 			// the AttributeDisjunctions that we asked for
-			for (String attributeName : disclosed.getIdentifiers()) {
-				String identifier;
-				String value;
-				if (!attributeName.equals(Attributes.META_DATA_FIELD)) {
-					identifier = credId.toString() + "." + attributeName;
-					value = new String(disclosed.get(attributeName));
-				} else {
-					identifier = credId.toString();
-					value = "present";
-				}
+			AttributeDisjunction disjunction = content.find(ai);
+			if (disjunction == null || disjunction.isSatisfied())
+				continue;
 
-				attributes.put(identifier, value);
-
-				// See if this disclosed attribute occurs in one of our disjunctions
-				AttributeDisjunction disjunction = content.find(identifier);
-				if (disjunction == null || disjunction.isSatisfied())
-					continue;
-
-				if (!disjunction.hasValues())
+			String value = foundAttrs.get(ai);
+			if (!disjunction.hasValues()) {
+				disjunction.setSatisfied(true);
+				attributes.put(ai, value);
+			}
+			else {
+				// If the request indicated that the attribute should have a specific value, then the containing
+				// disjunction is only satisfied if the actual value of the attribute is correct.
+				String requiredValue = disjunction.getValues().get(ai);
+				if (requiredValue.equals(value)) {
 					disjunction.setSatisfied(true);
-				else {
-					// If the request indicated that the attribute should have a specific value, then the containing
-					// disjunction is only satisfied if the actual value of the attribute is correct.
-					AttributeIdentifier ai = new AttributeIdentifier(identifier);
-					String requiredValue = disjunction.getValues().get(ai);
-					if (requiredValue.equals(value))
-						disjunction.setSatisfied(true);
+					attributes.put(ai, value);
 				}
 			}
 		}

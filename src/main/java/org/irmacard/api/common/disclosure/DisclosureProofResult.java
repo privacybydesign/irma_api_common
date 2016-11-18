@@ -33,6 +33,8 @@
 
 package org.irmacard.api.common.disclosure;
 
+import org.irmacard.credentials.info.AttributeIdentifier;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,18 +49,18 @@ public class DisclosureProofResult {
 	}
 
 	private Status status;
-	private Map<String, String> attributes;
+	private Map<AttributeIdentifier, String> attributes;
 	private String data;
 
 	public DisclosureProofResult() {
 		status = Status.VALID;
 	}
 
-	public Map<String, String> getAttributes() {
+	public Map<AttributeIdentifier, String> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(Map<String, String> attributes) {
+	public void setAttributes(Map<AttributeIdentifier, String> attributes) {
 		this.attributes = attributes;
 	}
 
