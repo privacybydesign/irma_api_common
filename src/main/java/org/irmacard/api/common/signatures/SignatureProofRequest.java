@@ -56,18 +56,14 @@ public class SignatureProofRequest extends DisclosureRequest {
 
     /**
      * Calculate Challenge for signature as in paper:
-     * @return challenge = H(commitment, h(msg))
+     * @return challenge = H(commitment, H(msg))
      * @throws InfoException
      */
     public BigInteger getChallenge() throws InfoException {
-        byte[] commitment = getNonce().toByteArray();
-        BigInteger messageHash;
-        if (! messageType.equals(MessageType.STRING)) {
+        if (messageType != MessageType.STRING)
             throw new InfoException("Other message types than string are not supported yet!");
-        } else {
-            messageHash = Crypto.sha256Hash(message.getBytes());
-        }
-        BigInteger challenge = Crypto.sha256Hash(commitment, messageHash.toByteArray());
-        return challenge;
+
+        BigInteger messageHash = Crypto.sha256Hash(message.getBytes());
+        return Crypto.sha256Hash(Crypto.asn1Encode(getNonce(), messageHash));
     }
 }
