@@ -50,9 +50,4 @@ public class DisclosureProofRequest extends DisclosureRequest {
 	public DisclosureProofRequest(BigInteger nonce, BigInteger context, AttributeDisjunctionList content) {
 		super(nonce, context, content);
 	}
-
-	@Override
-	public DisclosureProofResult verify(ProofList proofs) throws InfoException, KeyException {
-		return super.verify(proofs, getNonce());
-	}
 }

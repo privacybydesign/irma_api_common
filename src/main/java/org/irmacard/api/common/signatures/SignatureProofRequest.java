@@ -31,7 +31,7 @@ public class SignatureProofRequest extends DisclosureRequest {
         proofs.setSig(true); // Make sure we're verifying a signature
         SignatureProofResult result = new SignatureProofResult(proofs, this); // Our return object
 
-        DisclosureProofResult d = super.verify(proofs, getChallenge());
+        DisclosureProofResult d = super.verify(proofs);
         result.setStatus(d.getStatus());
 
         if (d.getStatus() == DisclosureProofResult.Status.VALID) {
@@ -55,15 +55,24 @@ public class SignatureProofRequest extends DisclosureRequest {
     }
 
     /**
-     * Calculate Challenge for signature as in paper:
-     * @return challenge = H(commitment, H(msg))
-     * @throws InfoException
+     * Calculate nonce for the proofs of knowledge as determined by the nonce received by the server
+     * (see {@link #getSignatureNonce()}).
+     * @return proofsnonce = H(servernonce, H(msg))
+     * @throws IllegalArgumentException if the message type is not STRING
      */
-    public BigInteger getChallenge() throws InfoException {
+    @Override
+    public BigInteger getNonce() {
         if (messageType != MessageType.STRING)
-            throw new InfoException("Other message types than string are not supported yet!");
+            throw new IllegalArgumentException("Other message types than string are not supported yet!");
 
         BigInteger messageHash = Crypto.sha256Hash(message.getBytes());
-        return Crypto.sha256Hash(Crypto.asn1Encode(getNonce(), messageHash));
+        return Crypto.sha256Hash(Crypto.asn1Encode(nonce, messageHash));
+    }
+
+    /**
+     * Get the nonce (to be hashed along with the message, as in {@link #getNonce()}).
+     */
+    public BigInteger getSignatureNonce() {
+        return nonce;
     }
 }

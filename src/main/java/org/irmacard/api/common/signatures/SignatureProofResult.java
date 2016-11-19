@@ -28,7 +28,7 @@ public class SignatureProofResult extends DisclosureProofResult {
     }
 
     public SignatureProofResult(ProofList proofs, SignatureProofRequest request) {
-        this(proofs, request.getMessage(), request.getMessageType(), request.getNonce(), request.getContext());
+        this(proofs, request.getMessage(), request.getMessageType(), request.getSignatureNonce(), request.getContext());
     }
 
     @Override

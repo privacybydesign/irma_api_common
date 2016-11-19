@@ -16,8 +16,8 @@ import java.util.HashSet;
 public abstract class SessionRequest implements Serializable {
 	private static final long serialVersionUID = -1765381227944439300L;
 
-	private BigInteger nonce;
-	private BigInteger context;
+	protected BigInteger nonce;
+	protected BigInteger context;
 
 	public SessionRequest(BigInteger nonce, BigInteger context) {
 		this.nonce = nonce;
