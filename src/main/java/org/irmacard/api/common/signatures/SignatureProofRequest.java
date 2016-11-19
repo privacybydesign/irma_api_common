@@ -1,7 +1,7 @@
 package org.irmacard.api.common.signatures;
 
 import org.irmacard.api.common.AttributeDisjunctionList;
-import org.irmacard.api.common.DisclosureRequest;
+import org.irmacard.api.common.disclosure.DisclosureProofRequest;
 import org.irmacard.api.common.disclosure.DisclosureProofResult;
 import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.proofs.ProofList;
@@ -12,7 +12,7 @@ import org.irmacard.credentials.info.KeyException;
 import java.math.BigInteger;
 
 @SuppressWarnings("unused")
-public class SignatureProofRequest extends DisclosureRequest {
+public class SignatureProofRequest extends DisclosureProofRequest {
     public enum MessageType { STRING
     }
     private String message;
