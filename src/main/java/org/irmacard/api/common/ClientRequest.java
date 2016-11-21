@@ -5,6 +5,7 @@ public class ClientRequest<T> {
 	private int timeout = 0;
 	private String data;
 	private T request;
+	private String callbackUrl;
 
 	public ClientRequest() {}
 
@@ -17,6 +18,15 @@ public class ClientRequest<T> {
 		this.timeout = timeout;
 		this.request = request;
 		this.data = data;
+	}
+
+	public ClientRequest(String data, T request, int timeout, String callbackUrl) {
+		this(data, request, timeout);
+		this.callbackUrl = callbackUrl;
+	}
+
+	public String getCallbackUrl() {
+		return callbackUrl;
 	}
 
 	public int getTimeout() {
