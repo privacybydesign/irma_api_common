@@ -30,22 +30,30 @@
 
 package org.irmacard.api.common;
 
-public class ClientQr {
+public class ClientQr extends IrmaQr {
 	private String u;
 	private String v;
 	private String vmax;
 
-	public ClientQr() {}
+	public ClientQr() {
+		super("irmasession");
+	}
 
 	public ClientQr(String version, String url) {
+		this();
 		v = version;
 		u = url;
 	}
 
-	public ClientQr(String version, String maxVersion, String url) {
+	public ClientQr(String version, String maxVersion, String url, String sessiontype) {
+		super(sessiontype);
 		u = url;
 		v = version;
 		vmax = maxVersion;
+	}
+
+	public ClientQr(String version, String maxVersion, String url) {
+		this(version, maxVersion, url, "irmasession");
 	}
 
 	public String getVersion() {
