@@ -12,6 +12,7 @@ import java.math.BigInteger;
 import java.util.Map;
 
 public class AttributeBasedSignature {
+	private final int v = 1;
 	private ProofList proofs;
 	private BigInteger nonce;
 	private BigInteger context;
@@ -53,5 +54,9 @@ public class AttributeBasedSignature {
 
 	public BigInteger getContext() {
 		return context;
+	}
+
+	public int getVersion() {
+		return v;
 	}
 }
