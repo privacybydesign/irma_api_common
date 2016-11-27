@@ -39,7 +39,7 @@ public class SignatureProofResult extends DisclosureProofResult {
         map.put("jti", getServiceProviderData());
         map.put("signature", signature);
         map.put("message", message);
-        map.put("messageType", messageType.toString());
+        map.put("messageType", messageType);
         return map;
     }
 
@@ -54,4 +54,6 @@ public class SignatureProofResult extends DisclosureProofResult {
     public MessageType getMessageType() {
         return messageType;
     }
+
+
 }
