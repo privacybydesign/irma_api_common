@@ -38,7 +38,6 @@ import org.irmacard.api.common.AttributeDisjunction;
 import org.irmacard.api.common.AttributeDisjunctionList;
 import org.irmacard.api.common.SessionRequest;
 import org.irmacard.api.common.exceptions.ApiException;
-import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
@@ -46,9 +45,7 @@ import org.irmacard.credentials.idemix.proofs.ProofList;
 import org.irmacard.credentials.info.*;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 @SuppressWarnings("unused")
@@ -117,6 +114,11 @@ public class DisclosureProofRequest extends SessionRequest {
 	}
 
 	public DisclosureProofResult verify(ProofList proofs) throws InfoException, KeyException {
+		return verify(proofs, Calendar.getInstance().getTime(), false);
+	}
+
+	protected DisclosureProofResult verify(ProofList proofs, Date validityDate, boolean allowExpired)
+	throws InfoException, KeyException {
 		DisclosureProofResult result = new DisclosureProofResult(); // Our return object
 		HashMap<AttributeIdentifier, String> attributes = new HashMap<>();
 		result.setAttributes(attributes);
@@ -126,14 +128,15 @@ public class DisclosureProofRequest extends SessionRequest {
 			result.setStatus(DisclosureProofResult.Status.INVALID);
 			return result;
 		}
+		if (validityDate != null && !proofs.isValidOn(validityDate)) {
+			result.setStatus(DisclosureProofResult.Status.EXPIRED);
+			if (!allowExpired)
+				return result;
+		}
 
-		HashMap<AttributeIdentifier, String> foundAttrs;
+		HashMap<AttributeIdentifier, String> foundAttrs = null;
 		try {
 			foundAttrs =  proofs.getAttributes();
-		} catch (CredentialsException e) {
-			System.out.println("Received expired credential");
-			result.setStatus(DisclosureProofResult.Status.EXPIRED);
-			return result;
 		} catch (IllegalArgumentException e) {
 			System.out.println("Metadata attribute missing, or unknown credential type");
 			result.setStatus(DisclosureProofResult.Status.INVALID);

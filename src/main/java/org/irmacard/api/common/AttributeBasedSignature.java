@@ -9,6 +9,8 @@ import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.KeyException;
 
 import java.math.BigInteger;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 public class AttributeBasedSignature {
@@ -33,12 +35,21 @@ public class AttributeBasedSignature {
 	}
 
 	public SignatureProofResult verify(String message) throws InfoException, KeyException {
+		return verify(message, Calendar.getInstance().getTime(), true);
+	}
+
+	public SignatureProofResult verify(String message, Date validityDate) throws InfoException, KeyException {
+		return verify(message, validityDate, false);
+	}
+
+	public SignatureProofResult verify(String message, Date validityDate, boolean allowExpired)
+	throws InfoException, KeyException {
 		proofs.populatePublicKeyArray();
-		proofs.setSig(true); // This value isn't stored in the serialized signature
+		proofs.setSig(true); // Verify this as an ABS (as opposed to a disclosure proof list)
 
 		SignatureProofRequest request = new SignatureProofRequest(nonce, context,
 				new AttributeDisjunctionList(), message, SignatureProofRequest.MessageType.STRING);
-		SignatureProofResult result = request.verify(proofs);
+		SignatureProofResult result = request.verify(proofs, validityDate, allowExpired);
 
 		attributes = result.getAttributes();
 		return result;

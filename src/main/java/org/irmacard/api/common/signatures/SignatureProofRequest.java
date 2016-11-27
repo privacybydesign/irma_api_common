@@ -3,6 +3,7 @@ package org.irmacard.api.common.signatures;
 import org.irmacard.api.common.AttributeDisjunctionList;
 import org.irmacard.api.common.disclosure.DisclosureProofRequest;
 import org.irmacard.api.common.disclosure.DisclosureProofResult;
+import org.irmacard.api.common.disclosure.DisclosureProofResult.Status;
 import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.proofs.ProofList;
 import org.irmacard.credentials.idemix.util.Crypto;
@@ -10,6 +11,8 @@ import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.KeyException;
 
 import java.math.BigInteger;
+import java.util.Calendar;
+import java.util.Date;
 
 @SuppressWarnings("unused")
 public class SignatureProofRequest extends DisclosureProofRequest {
@@ -26,21 +29,21 @@ public class SignatureProofRequest extends DisclosureProofRequest {
         this.messageType = messageType;
     }
 
+    public SignatureProofResult verify(ProofList proofs, boolean allowExpired) throws KeyException, InfoException {
+        return verify(proofs, Calendar.getInstance().getTime(), allowExpired);
+    }
+
     @Override
-    public SignatureProofResult verify(ProofList proofs) throws KeyException, InfoException {
+    public SignatureProofResult verify(ProofList proofs, Date validityDate, boolean allowExpired) throws KeyException, InfoException {
         proofs.setSig(true); // Make sure we're verifying a signature
         SignatureProofResult result = new SignatureProofResult(proofs, this); // Our return object
 
-        DisclosureProofResult d = super.verify(proofs);
-        result.setStatus(d.getStatus());
+        DisclosureProofResult d = super.verify(proofs, validityDate, allowExpired);
+        Status status = d.getStatus();
+        result.setStatus(status);
 
-        if (d.getStatus() == DisclosureProofResult.Status.VALID) {
-            try {
-                result.setAttributes(proofs.getAttributes());
-            } catch (CredentialsException e) {
-                // Will not happen; in this case d.getStatus() would not be VALID
-                throw new InfoException(e);
-            }
+        if (status == Status.VALID || (validityDate!=null && status == Status.EXPIRED)) {
+            result.setAttributes(proofs.getAttributes());
         }
 
         return result;
