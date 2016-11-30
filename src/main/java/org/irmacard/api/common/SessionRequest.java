@@ -41,6 +41,15 @@ public abstract class SessionRequest implements Serializable {
 		return issuers;
 	}
 
+	/**
+	 * Get the scheme manager of the first credential in this session request.
+	 * NOTE: we implicitly assume that all credentials are from the same manager, but we
+	 * do not check that here.
+	 */
+	public String getSchemeManager() {
+		return getCredentialList().iterator().next().getSchemeManagerName();
+	}
+
 	public BigInteger getNonce() {
 		return nonce;
 	}
