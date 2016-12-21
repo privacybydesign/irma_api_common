@@ -21,6 +21,7 @@ public enum ApiError {
 	ATTRIBUTES_EXPIRED(400, "Disclosed attributes were expired"),
 	UNEXPECTED_REQUEST(403, "Unexpected request in this state"),
 	UNKNOWN_PUBLIC_KEY(403, "Attributes were not valid against a known public key"),
+	KEYSHARE_PROOF_MISSING(403, "ProofP object from a keyshare server missing"),
 
 	// IdP or SP errors
 	JWT_INVALID(401, "JSON web token did not verify"),
