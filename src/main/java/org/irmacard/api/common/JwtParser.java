@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * A JWT parser for incoming issuer or service provider requests.
  */
-public class JwtParser <T extends ClientRequest<?>> {
+public class JwtParser <T> {
 	private SigningKeyResolver keyResolver;
 	private long maxAge;
 	private boolean allowUnsigned;
@@ -37,13 +37,19 @@ public class JwtParser <T extends ClientRequest<?>> {
 
 		try {
 			// The following gets the public final static strings T.JWT_SUBJECT and T.JWT_REQUEST_KEY.
-			// (Because of Java's type erasure it is impossible to verify at compiletime that these exist,
-			// even though T is required to subclass ClientRequest.)
 			this.subject = (String) clazz.getField("JWT_SUBJECT").get(null);
 			this.field = (String) clazz.getField("JWT_REQUEST_KEY").get(null);
 		} catch (IllegalAccessException|NoSuchFieldException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public JwtParser(Class<T> clazz, boolean allowUnsigned, long maxAge, String subject, String field) {
+		this.clazz = clazz;
+		this.allowUnsigned = allowUnsigned;
+		this.maxAge = maxAge;
+		this.subject = subject;
+		this.field = field;
 	}
 
 	/**
