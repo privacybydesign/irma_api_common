@@ -1,19 +1,24 @@
 package org.irmacard.api.common;
 
 import com.google.gson.JsonSyntaxException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SigningKeyResolver;
 import org.irmacard.api.common.exceptions.ApiError;
 import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.api.common.util.GsonUtil;
 
+import java.security.Key;
 import java.util.Calendar;
 import java.util.Map;
 
 /**
  * A JWT parser for incoming issuer or service provider requests.
  */
+@SuppressWarnings("unused")
 public class JwtParser <T> {
 	private SigningKeyResolver keyResolver;
+	private Key key;
 	private long maxAge;
 	private boolean allowUnsigned;
 	private String subject;
@@ -63,11 +68,17 @@ public class JwtParser <T> {
 	}
 
 	private Claims getSignedClaims(String jwt) {
-		Claims claims = Jwts.parser()
-				.requireSubject(subject)
-				.setSigningKeyResolver(keyResolver)
-				.parseClaimsJws(jwt)
-				.getBody();
+		// Hmm, got class name clash here, perhaps we should rename
+		io.jsonwebtoken.JwtParser parser = Jwts.parser()
+				.requireSubject(subject);
+
+		// Passing null to these setters is not allowed
+		if (key != null)
+			parser.setSigningKey(key);
+		else if (keyResolver != null)
+			parser.setSigningKeyResolver(keyResolver);
+
+		Claims claims = parser.parseClaimsJws(jwt).getBody();
 
 		// If we're here then parseClaimsJws() did not throw an exception, so the signature verified
 		authenticated = true;
@@ -165,6 +176,10 @@ public class JwtParser <T> {
 
 	public void setKeyResolver(SigningKeyResolver keyResolver) {
 		this.keyResolver = keyResolver;
+	}
+
+	public void setSigningKey(Key key) {
+		this.key = key;
 	}
 
 	/**
