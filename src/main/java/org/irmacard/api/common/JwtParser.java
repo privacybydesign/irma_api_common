@@ -8,6 +8,7 @@ import org.irmacard.api.common.exceptions.ApiError;
 import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.api.common.util.GsonUtil;
 
+import java.lang.reflect.Type;
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Map;
@@ -23,7 +24,9 @@ public class JwtParser <T> {
 	private boolean allowUnsigned;
 	private String subject;
 	private String field;
-	private Class<T> clazz;
+	private Type clazz;
+
+	private String jwt;
 
 	private Claims claims;
 	private T payload;
@@ -49,7 +52,7 @@ public class JwtParser <T> {
 		}
 	}
 
-	public JwtParser(Class<T> clazz, boolean allowUnsigned, long maxAge, String subject, String field) {
+	public JwtParser(Type clazz, boolean allowUnsigned, long maxAge, String subject, String field) {
 		this.clazz = clazz;
 		this.allowUnsigned = allowUnsigned;
 		this.maxAge = maxAge;
@@ -61,12 +64,15 @@ public class JwtParser <T> {
 	 * Parse the given JWT.
 	 */
 	public JwtParser<T> parseJwt(String jwt) {
-		claims = getClaims(jwt);
+		this.jwt = jwt;
+
+		claims = getClaims();
 		payload = parseClaims(claims);
 
 		return this;
 	}
 
+	private Claims getSignedClaims() { return getSignedClaims(jwt); }
 	private Claims getSignedClaims(String jwt) {
 		// Hmm, got class name clash here, perhaps we should rename
 		io.jsonwebtoken.JwtParser parser = Jwts.parser()
@@ -86,6 +92,7 @@ public class JwtParser <T> {
 		return claims;
 	}
 
+	private Claims getUnsignedClaims() { return getUnsignedClaims(jwt); }
 	private Claims getUnsignedClaims(String jwt) {
 		// If the JWT contains two dots, then the final part is a signature that we don't care about
 		int i = jwt.lastIndexOf('.');
@@ -102,22 +109,23 @@ public class JwtParser <T> {
 
 	/**
 	 * Parse the specified String as a JWT, checking its age, and its signature if necessary.
-	 * @param jwt The JWT
 	 * @return The claims contained in the JWT
 	 * @throws ApiException If there was no valid signature but there needed to be;
 	 *                      if the JWT was too old; or if the specified string could not be
 	 *                      parsed as a JWT
 	 */
+	public Claims getClaims() throws ApiException { return getClaims(jwt); }
 	public Claims getClaims(String jwt) throws ApiException {
-		Claims claims;
+		if (claims != null)
+			return claims;
 
 		try {
 			System.out.println("Trying signed JWT");
-			claims = getSignedClaims(jwt);
+			claims = getSignedClaims();
 		} catch (Exception e) {
 			if (allowUnsigned) {
 				System.out.println("Trying unsigned JWT");
-				claims = getUnsignedClaims(jwt);
+				claims = getUnsignedClaims();
 			} else {
 				throw new ApiException(ApiError.JWT_INVALID);
 			}
