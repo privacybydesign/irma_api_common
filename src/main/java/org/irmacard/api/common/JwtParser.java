@@ -1,9 +1,7 @@
 package org.irmacard.api.common;
 
 import com.google.gson.JsonSyntaxException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SigningKeyResolver;
+import io.jsonwebtoken.*;
 import org.irmacard.api.common.exceptions.ApiError;
 import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.api.common.util.GsonUtil;
@@ -29,6 +27,7 @@ public class JwtParser <T> {
 	private String jwt;
 
 	private Claims claims;
+	private Header header;
 	private T payload;
 	private boolean authenticated = false;
 
@@ -72,8 +71,7 @@ public class JwtParser <T> {
 		return this;
 	}
 
-	private Claims getSignedClaims() { return getSignedClaims(jwt); }
-	private Claims getSignedClaims(String jwt) {
+	private void parseSignedClaims() {
 		// Hmm, got class name clash here, perhaps we should rename
 		io.jsonwebtoken.JwtParser parser = Jwts.parser()
 				.requireSubject(subject);
@@ -84,16 +82,15 @@ public class JwtParser <T> {
 		else if (keyResolver != null)
 			parser.setSigningKeyResolver(keyResolver);
 
-		Claims claims = parser.parseClaimsJws(jwt).getBody();
+		Jws<Claims> parsedJwt = parser.parseClaimsJws(jwt);
+		header = parsedJwt.getHeader();
+		claims = parser.parseClaimsJws(jwt).getBody();
 
 		// If we're here then parseClaimsJws() did not throw an exception, so the signature verified
 		authenticated = true;
-
-		return claims;
 	}
 
-	private Claims getUnsignedClaims() { return getUnsignedClaims(jwt); }
-	private Claims getUnsignedClaims(String jwt) {
+	private void parseUnsignedClaims() {
 		// If the JWT contains two dots, then the final part is a signature that we don't care about
 		int i = jwt.lastIndexOf('.');
 		if (jwt.indexOf('.') != i) {
@@ -101,10 +98,12 @@ public class JwtParser <T> {
 			jwt = jwt.substring(0, i + 1);
 		}
 
-		return Jwts.parser()
+		Jwt<Header, Claims> parsedJwt = Jwts.parser()
 				.requireSubject(subject)
-				.parseClaimsJwt(jwt)
-				.getBody();
+				.parseClaimsJwt(jwt);
+
+		header = parsedJwt.getHeader();
+		claims = parsedJwt.getBody();
 	}
 
 	/**
@@ -114,18 +113,17 @@ public class JwtParser <T> {
 	 *                      if the JWT was too old; or if the specified string could not be
 	 *                      parsed as a JWT
 	 */
-	public Claims getClaims() throws ApiException { return getClaims(jwt); }
-	public Claims getClaims(String jwt) throws ApiException {
+	public Claims getClaims() throws ApiException {
 		if (claims != null)
 			return claims;
 
 		try {
 			System.out.println("Trying signed JWT");
-			claims = getSignedClaims();
+			parseSignedClaims();
 		} catch (Exception e) {
 			if (allowUnsigned) {
 				System.out.println("Trying unsigned JWT");
-				claims = getUnsignedClaims();
+				parseUnsignedClaims();
 			} else {
 				throw new ApiException(ApiError.JWT_INVALID);
 			}
@@ -169,6 +167,17 @@ public class JwtParser <T> {
 			return null;
 
 		return claims.getIssuer();
+	}
+
+	public String getKeyIdentifier() throws IllegalStateException {
+		if (payload == null)
+			throw new IllegalStateException("No JWT parsed yet");
+
+		String val = (String) header.get("kid");
+		if (val != null)
+			return val;
+		else
+			return getJwtIssuer();
 	}
 
 	/**
