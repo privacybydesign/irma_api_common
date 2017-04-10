@@ -22,14 +22,15 @@ import java.util.HashMap;
  */
 public class ApiClient {
 
-    public static String getIssuingJWT(HashMap<CredentialIdentifier, HashMap<String, String>> credentialList, String iss, boolean shouldSign, SignatureAlgorithm sigAlg, PrivateKey privKey) {
+    public static String getIssuingJWT(HashMap<CredentialIdentifier, HashMap<String, String>> credentialList, String keyID, String iss, boolean shouldSign, SignatureAlgorithm sigAlg, PrivateKey privKey) {
         return shouldSign ?
-                getSignedIssuingJWT(credentialList,iss,sigAlg, privKey) :
+                getSignedIssuingJWT(credentialList,keyID,iss,sigAlg, privKey) :
                 getUnsignedIssuingJWT(credentialList,iss);
     }
 
-    public static String getSignedIssuingJWT(HashMap<CredentialIdentifier, HashMap<String, String>> credentialList, String iss, SignatureAlgorithm sigAlg, PrivateKey privKey) {
+    public static String getSignedIssuingJWT(HashMap<CredentialIdentifier, HashMap<String, String>> credentialList, String keyID, String iss, SignatureAlgorithm sigAlg, PrivateKey privKey) {
         return Jwts.builder()
+                .setHeaderParam("kid", keyID)
                 .setPayload(getJwtClaims(credentialList,iss))
                 .signWith(sigAlg,
                         privKey)
