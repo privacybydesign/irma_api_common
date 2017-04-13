@@ -30,13 +30,13 @@ public class CredentialRequest implements Serializable {
 		this.attributes = attributes;
 	}
 
-	private static long getDefaultValidity() {
+	public static long getDefaultValidity() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MONTH, 6);
 		return floorValidityDate(cal.getTimeInMillis(), true);
 	}
 
-	private static long floorValidityDate(long timestamp, boolean isMillis) {
+	public static long floorValidityDate(long timestamp, boolean isMillis) {
 		if (!isMillis)
 			timestamp *= 1000;
 

@@ -34,6 +34,10 @@ public class ApiClient {
 
     public static String getSignedIssuingJWT(HashMap<CredentialIdentifier, HashMap<String, String>> credentialList, String keyID, String iss, SignatureAlgorithm sigAlg, PrivateKey privKey) {
         IdentityProviderRequest ipRequest = getIdentityProviderRequest(credentialList);
+        return getSignedIssuingJWT(ipRequest, keyID, iss, sigAlg, privKey);
+    }
+
+    public static String getSignedIssuingJWT(IdentityProviderRequest ipRequest, String keyID, String iss, SignatureAlgorithm sigAlg, PrivateKey privKey) {
         return buildJwt(keyID, sigAlg, privKey, getJwtClaims(ipRequest, "iprequest", "issue_request", iss));
     }
 
