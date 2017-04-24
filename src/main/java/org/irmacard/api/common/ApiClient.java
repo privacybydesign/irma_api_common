@@ -93,7 +93,13 @@ public class ApiClient {
         // Calculate expiry date: 6 months from now
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, 6);
-        long validity = (calendar.getTimeInMillis() / Attributes.EXPIRY_FACTOR) * Attributes.EXPIRY_FACTOR / 1000;
+
+        return getIdentityProviderRequest(credentialList, calendar.getTimeInMillis()/1000);
+    }
+
+    public static IdentityProviderRequest getIdentityProviderRequest(HashMap<CredentialIdentifier, HashMap<String, String>> credentialList, long expiry) {
+        //floor the expiry date
+        long validity = CredentialRequest.floorValidityDate(expiry,false);
 
         // Compute credential list for in the issuing request
         ArrayList<CredentialRequest> credentials = new ArrayList<>(credentialList.size());
