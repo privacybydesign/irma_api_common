@@ -125,6 +125,8 @@ public class JwtParser <T> {
 				System.out.println("Trying unsigned JWT");
 				parseUnsignedClaims();
 			} else {
+				System.out.println("JWT invalid:");
+				e.printStackTrace();
 				throw new ApiException(ApiError.JWT_INVALID);
 			}
 		}
