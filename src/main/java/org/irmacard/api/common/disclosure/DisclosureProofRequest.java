@@ -36,6 +36,7 @@ package org.irmacard.api.common.disclosure;
 
 import org.irmacard.api.common.AttributeDisjunction;
 import org.irmacard.api.common.AttributeDisjunctionList;
+import org.irmacard.api.common.JwtParser;
 import org.irmacard.api.common.SessionRequest;
 import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
@@ -43,6 +44,8 @@ import org.irmacard.credentials.idemix.IdemixSystemParameters;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
 import org.irmacard.credentials.idemix.proofs.ProofList;
 import org.irmacard.credentials.info.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -50,6 +53,8 @@ import java.util.*;
 
 @SuppressWarnings("unused")
 public class DisclosureProofRequest extends SessionRequest {
+	private static Logger logger = LoggerFactory.getLogger(DisclosureProofRequest.class);
+
 	private static final long serialVersionUID = 1016467840623150897L;
 
 	protected AttributeDisjunctionList content;
@@ -124,7 +129,7 @@ public class DisclosureProofRequest extends SessionRequest {
 		result.setAttributes(attributes);
 
 		if (!proofs.verify(getContext(), getNonce(), true)) {
-			System.out.println("Proofs did not verify");
+			logger.info("Proofs did not verify");
 			result.setStatus(DisclosureProofResult.Status.INVALID);
 			return result;
 		}
@@ -138,7 +143,7 @@ public class DisclosureProofRequest extends SessionRequest {
 		try {
 			foundAttrs =  proofs.getAttributes();
 		} catch (IllegalArgumentException e) {
-			System.out.println("Metadata attribute missing, or unknown credential type");
+			logger.info("Metadata attribute missing, or unknown credential type");
 			result.setStatus(DisclosureProofResult.Status.INVALID);
 			return result;
 		}

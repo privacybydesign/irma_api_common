@@ -5,6 +5,8 @@ import io.jsonwebtoken.*;
 import org.irmacard.api.common.exceptions.ApiError;
 import org.irmacard.api.common.exceptions.ApiException;
 import org.irmacard.api.common.util.GsonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.security.Key;
@@ -16,6 +18,8 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public class JwtParser <T> {
+	private static Logger logger = LoggerFactory.getLogger(JwtParser.class);
+
 	private SigningKeyResolver keyResolver;
 	private Key key;
 	private long maxAge;
@@ -94,7 +98,7 @@ public class JwtParser <T> {
 		// If the JWT contains two dots, then the final part is a signature that we don't care about
 		int i = jwt.lastIndexOf('.');
 		if (jwt.indexOf('.') != i) {
-			System.out.println("Warning: discarding JWT signature!");
+			logger.warn("Discarding JWT signature!");
 			jwt = jwt.substring(0, i + 1);
 		}
 
@@ -118,14 +122,14 @@ public class JwtParser <T> {
 			return claims;
 
 		try {
-			System.out.println("Trying signed JWT");
+			logger.info("Trying signed JWT");
 			parseSignedClaims();
 		} catch (Exception e) {
 			if (allowUnsigned) {
-				System.out.println("Trying unsigned JWT");
+				logger.info("Trying unsigned JWT");
 				parseUnsignedClaims();
 			} else {
-				System.out.println("JWT invalid:");
+				logger.info("JWT invalid:");
 				e.printStackTrace();
 				throw new ApiException(ApiError.JWT_INVALID);
 			}
