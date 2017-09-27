@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 
-version = '0.7.8'
+version = '0.7.9'
 group = 'org.irmacard.api'
 
 targetCompatibility = '1.7'
@@ -28,7 +28,7 @@ artifacts {
 dependencies {
     compile "com.google.code.gson:gson:2.2.2"
     compile 'io.jsonwebtoken:jjwt:0.6.0'
-    compile "org.irmacard.credentials:credentials_idemix:0.17.2"
+    compile "org.irmacard.credentials:credentials_idemix:0.18.1"
     compile 'org.slf4j:slf4j-api:1.7.25'
 
     testCompile "junit:junit:4.11"

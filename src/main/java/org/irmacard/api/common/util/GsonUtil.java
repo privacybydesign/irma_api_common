@@ -50,43 +50,19 @@ import java.util.Map;
  * via {@link #addTypeAdapter(Class, Object)}.
  */
 public class GsonUtil {
-	protected static Gson gson;
-	private static boolean shouldReload;
-	private static HashMap<Class, Object> adapters = new HashMap<>();
-
-	// Put in the (de)serialisers that we know of
-	static {
-		adapters.put(byte[].class, new ByteArrayToBase64TypeAdapter());
-		adapters.put(AttributeDisjunction.class, new AttributeDisjuctionSerializer());
-		adapters.put(Proof.class, new ProofSerializer());
-		adapters.put(CredentialIdentifier.class, new CredentialIdentifierSerializer());
-		adapters.put(AttributeIdentifier.class, new AttributeIdentifierSerializer());
-		shouldReload = true;
-	}
-
-	private static void reload() {
-		GsonBuilder builder = new GsonBuilder();
-		for (Map.Entry<Class, Object> entry : adapters.entrySet())
-			builder.registerTypeAdapter(entry.getKey(), entry.getValue());
-
-		builder.enableComplexMapKeySerialization();
-		builder.setDateFormat(DateFormat.LONG, DateFormat.LONG);
-		gson = builder.create();
-		shouldReload = false;
-	}
+	protected static GsonUtilBuilder builder = new GsonUtilBuilder();
+	protected static Gson gson = builder.create();
 
 	/**
 	 * Add the specified type adapter for the specified class.
 	 */
 	public static void addTypeAdapter(Class clazz, Object o) {
-		adapters.put(clazz, o);
-		shouldReload = true;
+		builder.addTypeAdapter(clazz, 0);
 	}
 
 	public static Gson getGson() {
-		if (shouldReload)
-			reload();
-
+		if (builder.shouldReload())
+			gson = builder.create();
 		return gson;
 	}
 }
