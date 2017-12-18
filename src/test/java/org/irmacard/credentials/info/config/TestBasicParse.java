@@ -34,20 +34,26 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.irmacard.credentials.info.*;
 import org.junit.Test;
 
-
 public class TestBasicParse {
 	static public final String schemeManager = "irma-demo";
 
-	URI core = new File(System.getProperty("user.dir")).toURI().resolve(
-			"irma_configuration/");
+	static URI core;
+	static URI spec;
 
-	URI spec = core.resolve(
-			"irma-demo/Surfnet/Issues/root/description.xml");
-	
+	static {
+		try {
+			core = TestBasicParse.class.getClassLoader().getResource("test_configuration/").toURI();
+			spec = core.resolve("pbdf/pbdf/Issues/email/description.xml");
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Test
 	public void parseConfig () throws InfoException {
 		CredentialDescription cd = new CredentialDescription(spec);
@@ -58,7 +64,7 @@ public class TestBasicParse {
 	public void initializeDescriptionStore() throws InfoException {
 		DescriptionStore.initialize(new DescriptionStoreDeserializer(core));
 	}
-	
+
 	@Test
 	public void retrieveCredentialInfo() throws InfoException {
 		if (!DescriptionStore.isInitialized())
@@ -77,7 +83,7 @@ public class TestBasicParse {
 			fail("Credential name incorrect");
 		}
 	}
-	
+
 	@Test
 	public void retrieveCredentialDescription() throws InfoException {
 		if (!DescriptionStore.isInitialized())
