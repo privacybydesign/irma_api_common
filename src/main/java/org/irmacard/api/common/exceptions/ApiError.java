@@ -27,7 +27,7 @@ public enum ApiError {
 	JWT_INVALID(401, "JSON web token did not verify"),
 	JWT_TOO_OLD(401, "JSON web token was too old"),
 	UNAUTHORIZED(403, "You are not authorized to issue or verify this attribute"),
-	ATTRIBUTES_WRONG(400, "Specified attribute(s) do not belong to this credential type"),
+	ATTRIBUTES_WRONG(400, "Specified attribute(s) do not belong to this credential type or missing attributes"),
 
 	// SP, IdP, or token errors
 	SESSION_UNKNOWN(400, "Unknown or expired session"),

@@ -373,18 +373,24 @@ public class Attributes implements Serializable {
 	 *                       instance and the {@link DescriptionStore}
 	 */
 	public ArrayList<BigInteger> toBigIntegers() throws InfoException {
-		List<String> names = getCredentialDescription().getAttributeNames();
-		ArrayList<BigInteger> bigints = new ArrayList<>(names.size() + 2);
+		List<AttributeDescription> ads = getCredentialDescription().getAttributes();
+		ArrayList<BigInteger> bigints = new ArrayList<>(ads.size() + 2);
 
 		// Add metadata field manually as it is not included in .getAttributeNames()
 		bigints.add(new BigInteger(get(META_DATA_FIELD)));
 
 		// Add the other attributes
-		for (String name : names) {
-			byte[] value = get(name);
-			if (value == null)
-				throw new InfoException("Attribute " + name + " missing");
-			bigints.add(new BigInteger(value));
+		for (AttributeDescription ad : ads) {
+			byte[] value = get(ad.getName());
+			if (value == null || value.length == 0) {
+				if (ad.isOptional()) {
+					bigints.add(new BigInteger(new byte[]{0}));
+				} else {
+					throw new InfoException("Attribute " + ad.getName() + " missing");
+				}
+			} else {
+				bigints.add(new BigInteger(value));
+			}
 		}
 
 		return bigints;

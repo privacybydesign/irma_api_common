@@ -37,11 +37,17 @@ import org.w3c.dom.Element;
 public class AttributeDescription implements Serializable{
 	private static final long serialVersionUID = 4609118645897084209L;
 	private String name;
+	private boolean optional;
 	private TranslatedString hrName;
 	private TranslatedString description;
 
-	AttributeDescription(Element e) {
+	AttributeDescription(Element e) throws InfoException {
 		name = e.getAttribute("id");
+		String optionalString = e.getAttribute("optional");
+		if (!optionalString.equals("true") && !optionalString.equals("false") && !optionalString.equals("")) {
+			throw new InfoException("Attribute 'optional' is not true or false");
+		}
+		optional = optionalString.equals("true");
 		hrName = new TranslatedString(e.getElementsByTagName("Name").item(0));
 		description = new TranslatedString(e.getElementsByTagName("Description").item(0));
 	}
@@ -58,6 +64,11 @@ public class AttributeDescription implements Serializable{
 	public String getName() {
 		return name;
 	}
+
+	/**
+	 * @return whether the attribute may be an empty string
+	 */
+	public boolean isOptional() { return optional; }
 
 	public TranslatedString getHrName() {
 		return hrName;

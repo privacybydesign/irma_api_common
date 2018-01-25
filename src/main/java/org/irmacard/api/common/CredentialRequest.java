@@ -117,12 +117,22 @@ public class CredentialRequest implements Serializable {
 			return false;
 
 		List<String> storeAttributes = cd.getAttributeNames();
-		if (storeAttributes.size() != getAttributes().size())
-			return false;
 
-		for (String attr : getAttributes().keySet())
+		// Are all attributes in the CredentailDescription?
+		for (String attr : attributes.keySet())
 			if (!storeAttributes.contains(attr))
 				return false;
+
+		// Does the CredentialDescription contain any attributes that the
+		// CredentialRequest does not contain, while it has to?
+		for (AttributeDescription ad : cd.getAttributes()) {
+			if (ad.isOptional()) continue; // attribute isn't required
+			if (!attributes.keySet().contains(ad.getName()))
+				return false;
+			String value = attributes.get(ad.getName());
+			if (value.length() == 0)
+				return false;
+		}
 
 		return true;
 	}
