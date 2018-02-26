@@ -142,8 +142,8 @@ public class CredentialRequest implements Serializable {
 	 * @return The BigIntegers
 	 * @throws InfoException If the attribute names do not match the ones from the description store
 	 */
-	public List<BigInteger> convertToBigIntegers() throws InfoException {
-		return convertToBigIntegers(true);
+	public List<BigInteger> convertToBigIntegers(byte metadataVersion) throws InfoException {
+		return convertToBigIntegers(metadataVersion, true);
 	}
 
 	/**
@@ -152,7 +152,7 @@ public class CredentialRequest implements Serializable {
 	 * @return The BigIntegers
 	 * @throws InfoException If the attribute names do not match the ones from the description store
 	 */
-	public List<BigInteger> convertToBigIntegers(boolean floorValidity) throws InfoException {
+	public List<BigInteger> convertToBigIntegers(byte metadataVersion, boolean floorValidity) throws InfoException {
 		if (!attributesMatchStore())
 			throw new InfoException("Incompatible credential types");
 
@@ -160,6 +160,7 @@ public class CredentialRequest implements Serializable {
 		attributesObject.setSigningDate(Calendar.getInstance().getTime());
 		attributesObject.setCredentialIdentifier(getIdentifier());
 		attributesObject.setKeyCounter(getKeyCounter());
+		attributesObject.setVersion(metadataVersion);
 		Calendar expires = Calendar.getInstance();
 		expires.setTimeInMillis(getValidity(floorValidity) * 1000);
 		attributesObject.setExpiryDate(expires.getTime());

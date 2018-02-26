@@ -102,7 +102,7 @@ public class Attributes implements Serializable {
 		add(META_DATA_FIELD, metadata);
 
 		// Set metadata fields to their default values
-		setMetadataField(new byte[]{CURRENT_VERSION}, Field.VERSION);
+		setVersion(CURRENT_VERSION);
 		setSigningDate(null);
 		setValidityDuration((short)(52 / 2));
 		setKeyCounter(0);
@@ -123,7 +123,7 @@ public class Attributes implements Serializable {
 			throw new IllegalArgumentException("Metadata attribute was absent but is compulsory");
 
 		attributes = new HashMap<>();
-		attributes.put(META_DATA_FIELD, values.get(1).toByteArray());
+		add(META_DATA_FIELD, values.get(1));
 
 		CredentialDescription cd = getCredentialDescription();
 		if (cd == null)
@@ -133,7 +133,7 @@ public class Attributes implements Serializable {
 		for (int i = 0; i < attributeNames.size(); ++i) {
 			BigInteger attribute = values.get(i+2);
 			if (attribute != null)
-				attributes.put(attributeNames.get(i), attribute.toByteArray());
+				add(attributeNames.get(i), attribute);
 		}
 	}
 
@@ -152,7 +152,7 @@ public class Attributes implements Serializable {
 			throw new IllegalArgumentException("Metadata attribute was absent but is compulsory");
 
 		attributes = new HashMap<>();
-		attributes.put(META_DATA_FIELD, values.get(1).toByteArray());
+		add(META_DATA_FIELD, values.get(1));
 
 		CredentialDescription cd = getCredentialDescription();
 		if (cd == null)
@@ -160,7 +160,7 @@ public class Attributes implements Serializable {
 
 		List<String> attributeNames = cd.getAttributeNames();
 		for (int i = 0; i < attributeNames.size(); ++i)
-			attributes.put(attributeNames.get(i), values.get(i+2).toByteArray());
+			add(attributeNames.get(i), values.get(i+2));
 	}
 
 	/**
@@ -171,11 +171,11 @@ public class Attributes implements Serializable {
 		attributes.put(META_DATA_FIELD, metadata.toByteArray());
 	}
 
-	public byte[] getMetadataField(Field field) {
+	private byte[] getMetadataField(Field field) {
 		return Arrays.copyOfRange(attributes.get(META_DATA_FIELD), field.offset, field.offset + field.length);
 	}
 
-	public void setMetadataField(byte[] value, Field field) {
+	private void setMetadataField(byte[] value, Field field) {
 		byte[] metadata = attributes.get(META_DATA_FIELD);
 
 		if (value.length > field.length)
@@ -194,6 +194,21 @@ public class Attributes implements Serializable {
 
 	public void add(String id, byte[] value) {
 		attributes.put(id, value);
+	}
+
+	public void add(String id, BigInteger value) {
+		if (!id.equals(META_DATA_FIELD) && getVersion() >= 3) {
+			if (value.testBit(0)) {
+				// This attribute has a value (possibly zero-length).
+				attributes.put(id, value.shiftRight(1).toByteArray());
+			} else {
+				// This attribute is not set.
+				attributes.put(id, null);
+			}
+		} else {
+			// No shifting applied
+			attributes.put(id, value.toByteArray());
+		}
 	}
 
 	public byte[] get(String id) {
@@ -217,6 +232,22 @@ public class Attributes implements Serializable {
 		}
 		res += "]";
 		return res;
+	}
+
+	/**
+	 * Get the version number for this credential.
+	 * Version >= 3 supports optional attributes.
+	 */
+	public byte getVersion() {
+		return getMetadataField(Field.VERSION)[0];
+	}
+
+	/**
+	 * Set the version number for this credential.
+	 * Version >= 3 supports optional attributes.
+	 */
+	public void setVersion(byte version) {
+		setMetadataField(new byte[]{version}, Field.VERSION);
 	}
 
 	/**
@@ -382,14 +413,32 @@ public class Attributes implements Serializable {
 		// Add the other attributes
 		for (AttributeDescription ad : ads) {
 			byte[] value = get(ad.getName());
+
+			// Check for empty attributes that are non-optional
 			if (value == null || value.length == 0) {
-				if (ad.isOptional()) {
-					bigints.add(new BigInteger(new byte[]{0}));
-				} else {
+				if (!ad.isOptional()) {
 					throw new InfoException("Attribute " + ad.getName() + " missing");
 				}
+			}
+
+			if (value == null) {
+				// This attribute does not exist.
+				bigints.add(new BigInteger(new byte[]{0}));
+			} else if (value.length == 0) {
+				// This attribute exists, but is a zero-length string.
+				// (Workaround for Java BigInteger requiring bytearrays with
+				// length > 0)
+				if (getVersion() < 3) {
+					throw new InfoException("Cannot encode zero-length attribute " + ad.getName() + " at version < 3");
+				}
+				bigints.add(new BigInteger(new byte[]{1}));
 			} else {
-				bigints.add(new BigInteger(value));
+				// Encode there is a value (non-zero-length string).
+				BigInteger big = new BigInteger(value);
+				if (getVersion() >= 3) {
+					big = big.shiftLeft(1).setBit(0);
+				}
+				bigints.add(big);
 			}
 		}
 
