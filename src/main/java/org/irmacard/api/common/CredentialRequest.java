@@ -117,12 +117,22 @@ public class CredentialRequest implements Serializable {
 			return false;
 
 		List<String> storeAttributes = cd.getAttributeNames();
-		if (storeAttributes.size() != getAttributes().size())
-			return false;
 
-		for (String attr : getAttributes().keySet())
+		// Are all attributes in the CredentailDescription?
+		for (String attr : attributes.keySet())
 			if (!storeAttributes.contains(attr))
 				return false;
+
+		// Does the CredentialDescription contain any attributes that the
+		// CredentialRequest does not contain, while it has to?
+		for (AttributeDescription ad : cd.getAttributes()) {
+			if (ad.isOptional()) continue; // attribute isn't required
+			if (!attributes.keySet().contains(ad.getName()))
+				return false;
+			String value = attributes.get(ad.getName());
+			if (value.length() == 0)
+				return false;
+		}
 
 		return true;
 	}
@@ -132,8 +142,8 @@ public class CredentialRequest implements Serializable {
 	 * @return The BigIntegers
 	 * @throws InfoException If the attribute names do not match the ones from the description store
 	 */
-	public List<BigInteger> convertToBigIntegers() throws InfoException {
-		return convertToBigIntegers(true);
+	public List<BigInteger> convertToBigIntegers(byte metadataVersion) throws InfoException {
+		return convertToBigIntegers(metadataVersion, true);
 	}
 
 	/**
@@ -142,7 +152,7 @@ public class CredentialRequest implements Serializable {
 	 * @return The BigIntegers
 	 * @throws InfoException If the attribute names do not match the ones from the description store
 	 */
-	public List<BigInteger> convertToBigIntegers(boolean floorValidity) throws InfoException {
+	public List<BigInteger> convertToBigIntegers(byte metadataVersion, boolean floorValidity) throws InfoException {
 		if (!attributesMatchStore())
 			throw new InfoException("Incompatible credential types");
 
@@ -150,6 +160,7 @@ public class CredentialRequest implements Serializable {
 		attributesObject.setSigningDate(Calendar.getInstance().getTime());
 		attributesObject.setCredentialIdentifier(getIdentifier());
 		attributesObject.setKeyCounter(getKeyCounter());
+		attributesObject.setVersion(metadataVersion);
 		Calendar expires = Calendar.getInstance();
 		expires.setTimeInMillis(getValidity(floorValidity) * 1000);
 		attributesObject.setExpiryDate(expires.getTime());
