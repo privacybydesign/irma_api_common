@@ -200,7 +200,14 @@ public class Attributes implements Serializable {
 		if (!id.equals(META_DATA_FIELD) && getVersion() >= 3) {
 			if (value.testBit(0)) {
 				// This attribute has a value (possibly zero-length).
-				attributes.put(id, value.shiftRight(1).toByteArray());
+				// Drop the least-significant bit and convert to a byte[].
+				byte[] bytes = value.shiftRight(1).toByteArray();
+				if (bytes.length == 1 && bytes[0] == 0) {
+					// Empty but set attribute. Work around BigInteger limitation.
+					attributes.put(id, new byte[]{});
+				} else {
+					attributes.put(id, bytes);
+				}
 			} else {
 				// This attribute is not set.
 				attributes.put(id, null);
