@@ -216,7 +216,13 @@ public class ProofList extends ArrayList<Proof> {
 				String value;
 				if (!attributeName.equals(Attributes.META_DATA_FIELD)) {
 					identifier = new AttributeIdentifier(credId, attributeName);
-					value = new String(disclosed.get(attributeName));
+					byte[] byteValue = disclosed.get(attributeName);
+					if (byteValue == null) {
+						// This is checked in other places. Check it here again
+						// as a sanity check.
+						throw new RuntimeException("trying to disclose attribute with no value");
+					}
+					value = new String(byteValue);
 				} else {
 					identifier = new AttributeIdentifier(credId.toString());
 					value = "present";
