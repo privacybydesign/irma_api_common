@@ -1,8 +1,7 @@
 package org.irmacard.api.common.signatures;
 
-import org.irmacard.api.common.AttributeBasedSignature;
+import org.irmacard.api.common.IrmaSignedMessage;
 import org.irmacard.api.common.disclosure.DisclosureProofResult;
-import org.irmacard.api.common.signatures.SignatureProofRequest.MessageType;
 import org.irmacard.credentials.idemix.proofs.ProofList;
 
 import java.math.BigInteger;
@@ -11,24 +10,20 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class SignatureProofResult extends DisclosureProofResult {
-    private AttributeBasedSignature signature;
-    private String message;
-    private MessageType messageType;
+    private IrmaSignedMessage signature;
 
     public SignatureProofResult() {
         setStatus(Status.INVALID); // A signature without a signature is off course invalid
     }
 
-    public SignatureProofResult(ProofList proofs, String message, MessageType messageType,
+    public SignatureProofResult(ProofList proofs, String message,
                                 BigInteger nonce, BigInteger context) {
         setStatus(Status.VALID); // Note: we don't check the validity here!
-        this.signature = new AttributeBasedSignature(proofs, nonce, context);
-        this.message = message;
-        this.messageType = messageType;
+        this.signature = new IrmaSignedMessage(proofs, nonce, context, message);
     }
 
     public SignatureProofResult(ProofList proofs, SignatureProofRequest request) {
-        this(proofs, request.getMessage(), request.getMessageType(), request.getSignatureNonce(), request.getContext());
+        this(proofs, request.getMessage(), request.getSignatureNonce(), request.getContext());
     }
 
     @Override
@@ -38,22 +33,10 @@ public class SignatureProofResult extends DisclosureProofResult {
         map.put("attributes", getAttributes());
         map.put("jti", getServiceProviderData());
         map.put("signature", signature);
-        map.put("message", message);
-        map.put("messageType", messageType);
         return map;
     }
 
-    public AttributeBasedSignature getSignature() {
+    public IrmaSignedMessage getSignature() {
         return signature;
     }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public MessageType getMessageType() {
-        return messageType;
-    }
-
-
 }

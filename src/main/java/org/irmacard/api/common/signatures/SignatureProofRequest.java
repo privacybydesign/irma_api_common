@@ -16,21 +16,26 @@ import java.util.Date;
 
 @SuppressWarnings("unused")
 public class SignatureProofRequest extends DisclosureProofRequest {
-    public enum MessageType { STRING
-    }
     private String message;
-    private MessageType messageType;
-
 
     public SignatureProofRequest(BigInteger nonce, BigInteger context,
-                                 AttributeDisjunctionList content, String message, MessageType messageType) {
+                                 AttributeDisjunctionList content, String message) {
         super(nonce, context, content);
         this.message = message;
-        this.messageType = messageType;
     }
 
     public SignatureProofResult verify(ProofList proofs, boolean allowExpired) throws KeyException, InfoException {
         return verify(proofs, Calendar.getInstance().getTime(), allowExpired);
+    }
+
+    @Override
+    public void setNonceAndContext() {
+        if (this.nonce == null) {
+            this.nonce = generateNonce(getLargestParameters());
+        }
+        if (this.context == null) {
+            this.context = generateContext();
+        }
     }
 
     @Override
@@ -53,10 +58,6 @@ public class SignatureProofRequest extends DisclosureProofRequest {
         return message;
     }
 
-    public MessageType getMessageType() {
-        return messageType;
-    }
-
     /**
      * Calculate nonce for the proofs of knowledge as determined by the nonce received by the server
      * (see {@link #getSignatureNonce()}).
@@ -65,9 +66,6 @@ public class SignatureProofRequest extends DisclosureProofRequest {
      */
     @Override
     public BigInteger getNonce() {
-        if (messageType != MessageType.STRING)
-            throw new IllegalArgumentException("Other message types than string are not supported yet!");
-
         BigInteger messageHash = Crypto.sha256Hash(message.getBytes());
         return Crypto.sha256Hash(Crypto.asn1Encode(nonce, messageHash));
     }
