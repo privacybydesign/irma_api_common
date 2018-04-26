@@ -161,12 +161,10 @@ public class Crypto {
 	 * @param input		A byte array of data to be hashed
 	 * @return			The unsigned integer representing the hash value
 	 */
-	public static BigInteger sha256Hash(byte[]... input) {
+	public static BigInteger sha256Hash(byte[] input) {
 		byte[] hash = null;
 		try {
-			for (byte[] arr : input)
-				if (arr != null)
-					hash = MessageDigest.getInstance("SHA-256").digest(arr);
+			hash = MessageDigest.getInstance("SHA-256").digest(input);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Algorithm SHA-256 not found");
