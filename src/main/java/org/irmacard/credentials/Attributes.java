@@ -440,8 +440,16 @@ public class Attributes implements Serializable {
 				}
 				bigints.add(new BigInteger(new byte[]{1}));
 			} else {
-				// Encode there is a value (non-zero-length string).
-				BigInteger big = new BigInteger(value);
+				// This attribute exists, and it has a non-zero value.
+				// We want to be compatible with the Go implementation, in which the string -> bigint conversion
+				// always yields positive bigints. By contrast, in the Java string -> bigint conversion, the most
+				// significant bit is interpreted as a sign bit (two's complement). In order to prevent this we
+				// prepend an extra 0-byte in the byte[] -> bigint conversion (the String -> byte[] conversion
+				// has already happened elsewhere), ensuring that we always get a positive bigint.
+				byte[] positiveBytes = new byte[value.length+1];
+				positiveBytes[0] = 0;
+				System.arraycopy(value, 0, positiveBytes, 1, value.length);
+				BigInteger big = new BigInteger(positiveBytes);
 				if (getVersion() >= 3) {
 					big = big.shiftLeft(1).setBit(0);
 				}

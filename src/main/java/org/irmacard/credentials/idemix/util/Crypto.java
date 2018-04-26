@@ -225,9 +225,20 @@ public class Crypto {
 		BigInteger exponent;
 		for (int i = 0; i < exps.size(); i++) {
 			exponent = exps.get(i);
-			if (exponent.bitLength() > maxMessageLength)
-				exponent = Crypto.sha256Hash(exponent.toByteArray());
+			if (exponent.bitLength() > maxMessageLength) {
+				byte[] array = exponent.toByteArray();
 
+				// .toByteArray() uses two's complement to serialize to bits - i.e., the most significant bit
+				// is the sign bit, which is always 0 as attributes are always positive. If the amount of
+				// bits of the bigint is divisible by 8 (after possibly left-bitshifting for the presence
+				// bit), so that the most significant bit would be 1, .toByteArray() prepends an extra 0-byte
+				// to achieve this. This contrasts with Go's .Bytes() method on *big.Int as this method
+				// ignores the bigint's sign. In order to be compatible with Go's implementation, we strip
+				// off the leading 0-byte in this case.
+				if (array[0] == 0)
+					array = Arrays.copyOfRange(array, 1, array.length);
+				exponent = Crypto.sha256Hash(array);
+			}
 			// tmp = bases_i ^ exps_i (mod modulus), with exps_i hashed if it exceeds maxMessageLength
 			tmp = bases.get(i).modPow(exponent, modulus);
 
