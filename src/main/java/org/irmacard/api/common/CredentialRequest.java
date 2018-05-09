@@ -116,6 +116,10 @@ public class CredentialRequest implements Serializable {
 		if (cd == null)
 			return false;
 
+		// No attributes in this credential request.
+		if (attributes.size() == 0)
+			return false;
+
 		List<String> storeAttributes = cd.getAttributeNames();
 
 		// Are all attributes in the CredentailDescription?
