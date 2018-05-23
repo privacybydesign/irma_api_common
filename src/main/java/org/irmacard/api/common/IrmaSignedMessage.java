@@ -2,7 +2,7 @@ package org.irmacard.api.common;
 
 import org.irmacard.api.common.signatures.SignatureProofRequest;
 import org.irmacard.api.common.signatures.SignatureProofResult;
-import org.irmacard.credentials.CredentialsException;
+import org.irmacard.api.common.timestamp.Timestamp;
 import org.irmacard.credentials.idemix.proofs.ProofList;
 import org.irmacard.credentials.info.AttributeIdentifier;
 import org.irmacard.credentials.info.InfoException;
@@ -19,6 +19,7 @@ public class IrmaSignedMessage {
 	private BigInteger nonce;
 	private BigInteger context;
 	private String message;
+	private Timestamp timestamp;
 
 	private transient Map<AttributeIdentifier, String> attributes;
 
