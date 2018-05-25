@@ -83,6 +83,10 @@ public class IrmaSignedMessage {
 		return context;
 	}
 
+	public Timestamp getTimestamp() {
+		return timestamp;
+	}
+
 	public int getVersion() {
 		return v;
 	}
