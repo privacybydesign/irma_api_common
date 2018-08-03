@@ -3,6 +3,7 @@ package org.irmacard.api.common.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.irmacard.api.common.AttributeDisjunction;
+import org.irmacard.api.common.ProtocolVersion;
 import org.irmacard.credentials.idemix.proofs.Proof;
 import org.irmacard.credentials.info.AttributeIdentifier;
 import org.irmacard.credentials.info.CredentialIdentifier;
@@ -21,6 +22,7 @@ public class GsonUtilBuilder {
 		adapters.put(Proof.class, new ProofSerializer());
 		adapters.put(CredentialIdentifier.class, new CredentialIdentifierSerializer());
 		adapters.put(AttributeIdentifier.class, new AttributeIdentifierSerializer());
+		adapters.put(ProtocolVersion.class, new ProtocolVersionSerializer());
 		shouldReload = true;
 	}
 

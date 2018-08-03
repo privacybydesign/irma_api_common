@@ -4,8 +4,8 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.util.encoders.Base64;
 import org.irmacard.api.common.AttributeDisjunctionList;
+import org.irmacard.api.common.SessionType;
 import org.irmacard.api.common.disclosure.DisclosureProofRequest;
 import org.irmacard.api.common.disclosure.DisclosureProofResult;
 import org.irmacard.api.common.disclosure.DisclosureProofResult.Status;
@@ -25,9 +25,14 @@ public class SignatureProofRequest extends DisclosureProofRequest {
     private String message;
     private transient Timestamp timestamp;
 
+    public SignatureProofRequest() {
+        type = SessionType.SIGNING;
+    }
+
     public SignatureProofRequest(BigInteger nonce, BigInteger context,
                                  AttributeDisjunctionList content, String message) {
         super(nonce, context, content);
+        type = SessionType.SIGNING;
         this.message = message;
     }
 
@@ -86,7 +91,6 @@ public class SignatureProofRequest extends DisclosureProofRequest {
         vector.add(new ASN1Integer(messageHash));
         if (timestamp != null)
             vector.add(new DEROctetString(timestamp.Sig.Data));
-
         try {
             return Crypto.sha256Hash(new DERSequence(vector).getEncoded());
         } catch (IOException e) {

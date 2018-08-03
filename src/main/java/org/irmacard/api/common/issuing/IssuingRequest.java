@@ -1,9 +1,6 @@
 package org.irmacard.api.common.issuing;
 
-import org.irmacard.api.common.AttributeDisjunction;
-import org.irmacard.api.common.AttributeDisjunctionList;
-import org.irmacard.api.common.CredentialRequest;
-import org.irmacard.api.common.SessionRequest;
+import org.irmacard.api.common.*;
 import org.irmacard.credentials.idemix.IdemixPublicKey;
 import org.irmacard.credentials.idemix.IdemixSystemParameters;
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
@@ -24,8 +21,13 @@ public class IssuingRequest extends SessionRequest {
 	private ArrayList<CredentialRequest> credentials;
 	private AttributeDisjunctionList disclose = new AttributeDisjunctionList();
 
+	public IssuingRequest() {
+		type = SessionType.ISSUING;
+	}
+
 	public IssuingRequest(BigInteger nonce, BigInteger context, ArrayList<CredentialRequest> credentials) {
 		super(nonce, context);
+		type = SessionType.ISSUING;
 		this.credentials = credentials;
 	}
 

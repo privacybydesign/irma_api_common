@@ -18,6 +18,10 @@ public abstract class SessionRequest implements Serializable {
 
 	protected BigInteger nonce;
 	protected BigInteger context;
+	protected SessionType type = SessionType.UNKNOWN;
+	protected ProtocolVersion protocolVersion;
+
+	public SessionRequest() {}
 
 	public SessionRequest(BigInteger nonce, BigInteger context) {
 		this.nonce = nonce;
@@ -64,6 +68,14 @@ public abstract class SessionRequest implements Serializable {
 
 	public void setContext(BigInteger context) {
 		this.context = context;
+	}
+
+	public ProtocolVersion getProtocolVersion() {
+		return protocolVersion;
+	}
+
+	public void setProtocolVersion(ProtocolVersion protocolVersion) {
+		this.protocolVersion = protocolVersion;
 	}
 
 	public static BigInteger generateNonce(IdemixSystemParameters params) {
