@@ -23,11 +23,12 @@ public class IrmaSignedMessage {
 
 	private transient Map<AttributeIdentifier, String> attributes;
 
-	public IrmaSignedMessage(ProofList proofs, BigInteger nonce, BigInteger context, String message) {
+	public IrmaSignedMessage(ProofList proofs, BigInteger nonce, BigInteger context, String message, Timestamp timestamp) {
 		this.signature = proofs;
 		this.nonce = nonce;
 		this.context = context;
 		this.message = message;
+		this.timestamp = timestamp;
 	}
 
 	public Map<AttributeIdentifier, String> getAttributes() throws IllegalArgumentException {
@@ -59,6 +60,7 @@ public class IrmaSignedMessage {
 		if (request == null) {
 			request = new SignatureProofRequest(nonce, context,
 					new AttributeDisjunctionList(), message);
+			request.setTimestamp(getTimestamp());
 		}
 
 		SignatureProofResult result = request.verify(signature, validityDate, allowExpired);

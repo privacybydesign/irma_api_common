@@ -2,6 +2,7 @@ package org.irmacard.api.common.signatures;
 
 import org.irmacard.api.common.IrmaSignedMessage;
 import org.irmacard.api.common.disclosure.DisclosureProofResult;
+import org.irmacard.api.common.timestamp.Timestamp;
 import org.irmacard.credentials.idemix.proofs.ProofList;
 
 import java.math.BigInteger;
@@ -17,13 +18,13 @@ public class SignatureProofResult extends DisclosureProofResult {
     }
 
     public SignatureProofResult(ProofList proofs, String message,
-                                BigInteger nonce, BigInteger context) {
+                                BigInteger nonce, BigInteger context, Timestamp timestamp) {
         setStatus(Status.VALID); // Note: we don't check the validity here!
-        this.signature = new IrmaSignedMessage(proofs, nonce, context, message);
+        this.signature = new IrmaSignedMessage(proofs, nonce, context, message, timestamp);
     }
 
     public SignatureProofResult(ProofList proofs, SignatureProofRequest request) {
-        this(proofs, request.getMessage(), request.getSignatureNonce(), request.getContext());
+        this(proofs, request.getMessage(), request.getSignatureNonce(), request.getContext(), request.getTimestamp());
     }
 
     @Override
