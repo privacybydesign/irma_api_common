@@ -60,6 +60,7 @@ public class IrmaSignedMessage {
 		if (request == null) {
 			request = new SignatureProofRequest(nonce, context,
 					new AttributeDisjunctionList(), message);
+			request.setTimestamp(getTimestamp());
 		}
 
 		SignatureProofResult result = request.verify(signature, validityDate, allowExpired);
