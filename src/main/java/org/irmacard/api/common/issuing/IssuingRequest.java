@@ -29,6 +29,12 @@ public class IssuingRequest extends SessionRequest {
 		this.credentials = credentials;
 	}
 
+	public IssuingRequest(BigInteger nonce, BigInteger context, ArrayList<CredentialRequest> credentials, AttributeDisjunctionList disclose) {
+		super(nonce, context);
+		this.credentials = credentials;
+		this.disclose = disclose;
+	}
+
 	public ArrayList<CredentialRequest> getCredentials() {
 		return credentials;
 	}
