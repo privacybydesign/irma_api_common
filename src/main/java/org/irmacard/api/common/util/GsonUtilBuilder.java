@@ -45,6 +45,7 @@ public class GsonUtilBuilder {
 
 		builder.enableComplexMapKeySerialization();
 		builder.setDateFormat(DateFormat.LONG, DateFormat.LONG);
+		builder.disableHtmlEscaping();
 		shouldReload = false;
 		return builder.create();
 	}

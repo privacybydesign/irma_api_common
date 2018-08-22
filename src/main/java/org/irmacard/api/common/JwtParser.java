@@ -1,5 +1,6 @@
 package org.irmacard.api.common;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import io.jsonwebtoken.*;
 import org.irmacard.api.common.exceptions.ApiError;
@@ -34,6 +35,8 @@ public class JwtParser <T> {
 	private Header header;
 	private T payload;
 	private boolean authenticated = false;
+
+	private static Gson gson;
 
 	/**
 	 * Construct a new parser.
@@ -152,10 +155,10 @@ public class JwtParser <T> {
 		// But if the structure of the contents of the map exactly matches the fields from T,
 		// then we can convert the map to json, and then that json to a T instance.
 		Map map = claims.get(field, Map.class);
-		String json = GsonUtil.getGson().toJson(map);
+		String json = getGson().toJson(map);
 
 		try {
-			return GsonUtil.getGson().fromJson(json, clazz);
+			return getGson().fromJson(json, clazz);
 		} catch (JsonSyntaxException e) {
 			throw new ApiException(ApiError.MALFORMED_ISSUER_REQUEST);
 		}
@@ -214,5 +217,13 @@ public class JwtParser <T> {
 			throw new IllegalStateException("No JWT parsed yet");
 
 		return authenticated;
+	}
+
+	private static Gson getGson() {
+		return gson != null ? gson : GsonUtil.getGson();
+	}
+
+	public static void setGson(Gson gson) {
+		JwtParser.gson = gson;
 	}
 }
