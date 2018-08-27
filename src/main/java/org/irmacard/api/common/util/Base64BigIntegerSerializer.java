@@ -10,7 +10,11 @@ public class Base64BigIntegerSerializer implements JsonSerializer<BigInteger>, J
 	@Override
 	public BigInteger deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
 		try {
-			return new BigInteger(1, Base64.decode(json.getAsJsonPrimitive().getAsString()));
+			JsonPrimitive p = json.getAsJsonPrimitive();
+			if (p.isString())
+				return new BigInteger(1, Base64.decode(json.getAsJsonPrimitive().getAsString()));
+			else
+				return p.getAsBigInteger();
 		} catch (Exception e) {
 			throw new JsonParseException("Failed parsing json into BigInteger", e);
 		}
