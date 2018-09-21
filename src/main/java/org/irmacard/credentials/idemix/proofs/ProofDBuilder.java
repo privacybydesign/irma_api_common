@@ -150,8 +150,12 @@ public class ProofDBuilder extends ProofBuilder {
 		HashMap<Integer, BigInteger> a_responses = new HashMap<>();
 		for(Integer i : undisclosed_attributes) {
 			BigInteger exponent = credential.getAttribute(i);
-			if (exponent.bitLength() > params.get_l_m())
-				exponent = Crypto.sha256Hash(exponent.toByteArray());
+			if (exponent.bitLength() > params.get_l_m()) {
+				byte[] array = exponent.toByteArray();
+				if (array[0] == 0)
+					array = Arrays.copyOfRange(array, 1, array.length);
+				exponent = Crypto.sha256Hash(array);
+			}
 			a_responses.put(i, rand.a_randomizers.get(i).
 					add(c.multiply(exponent)));
 		}

@@ -145,8 +145,12 @@ public class ProofD implements Proof {
 		for(Entry<Integer, BigInteger> entry : a_disclosed.entrySet()) {
 			Integer idx = entry.getKey();
 			BigInteger attribute = entry.getValue();
-			if (attribute.bitLength() > params.get_l_m())
-				attribute = Crypto.sha256Hash(attribute.toByteArray());
+			if (attribute.bitLength() > params.get_l_m()) {
+				byte[] array = attribute.toByteArray();
+				if (array[0] == 0)
+					array = Arrays.copyOfRange(array, 1, array.length);
+				attribute = Crypto.sha256Hash(array);
+			}
 			BigInteger tmp = pk.getGeneratorR(idx).modPow(attribute, n);
 			numerator = numerator.multiply(tmp).mod(n);
 		}
