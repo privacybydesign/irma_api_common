@@ -147,26 +147,26 @@ public class DisclosureProofRequest extends SessionRequest {
 			result.setStatus(DisclosureProofResult.Status.INVALID);
 			return result;
 		}
-
-		for (AttributeIdentifier ai : foundAttrs.keySet()) {
-			// For each of the disclosed attributes in this proof, see if they satisfy one of
-			// the AttributeDisjunctions that we asked for
-			AttributeDisjunction disjunction = content.find(ai);
-			if (disjunction == null || disjunction.isSatisfied())
-				continue;
-
-			String value = foundAttrs.get(ai);
-			if (!disjunction.hasValues()) {
-				disjunction.setSatisfied(true);
-				attributes.put(ai, value);
-			}
-			else {
-				// If the request indicated that the attribute should have a specific value, then the containing
-				// disjunction is only satisfied if the actual value of the attribute is correct.
-				String requiredValue = disjunction.getValues().get(ai);
-				if (requiredValue.equals(value)) {
-					disjunction.setSatisfied(true);
-					attributes.put(ai, value);
+		
+		for (AttributeDisjunction disjunction : content) {
+			// For each of the disjunctions, lookup attributes satisfying them
+			for (AttributeIdentifier ai : disjunction) {
+				if (foundAttrs.containsKey(ai)) {
+					String value = foundAttrs.get(ai);
+					if (!disjunction.hasValues()) {	
+						disjunction.setSatisfied(true);
+						attributes.put(ai, value);
+						break;
+					} else {
+						// If the request indicated that the attribute should have a specific value, then the containing
+						// disjunction is only satisfied if the actual value of the attribute is correct.
+						String requiredValue = disjunction.getValues().get(ai);
+						if (requiredValue.equals(value)) {
+							disjunction.setSatisfied(true);
+							attributes.put(ai, value);
+							break;
+						}
+					}
 				}
 			}
 		}
