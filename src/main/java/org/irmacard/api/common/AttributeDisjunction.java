@@ -49,13 +49,14 @@ public class AttributeDisjunction extends ArrayList<AttributeIdentifier> {
 
 	private String label;
 	private HashMap<AttributeIdentifier, String> values = new HashMap<>();
-	private boolean optional = false;
+	private boolean optional;
 
 	private transient AttributeIdentifier selected;
 	private transient boolean satisfied = false;
 
-	public AttributeDisjunction(String label) {
+	public AttributeDisjunction(String label, boolean optional) {
 		this.label = label;
+		this.optional = optional;
 	}
 
 	public AttributeDisjunction(String label, AttributeIdentifier value) {
