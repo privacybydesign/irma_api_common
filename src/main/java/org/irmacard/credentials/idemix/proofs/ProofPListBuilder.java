@@ -69,7 +69,7 @@ public class ProofPListBuilder {
 		// FIXME: Here, we only return one ProofP.
 		// This means that we do not support one issuing server issuing two credentials
 		// using two distinct Idemix issuing keys!
-		ProofPBuilder builder = builders.get(0);
+		ProofPBuilder builder = builders.get(builders.size()-1);
 		return builder.createProof(challenge, publicKey);
 	}
 }
