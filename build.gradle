@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 
-version = '1.2.0'
+version = '1.2.1'
 group = 'org.irmacard.api'
 
 targetCompatibility = '1.7'
