@@ -44,7 +44,6 @@ public class IssuerDescription extends ConfigurationParser implements Serializab
 	private String id;
 	private String contactAddress;
 	private String contactEMail;
-	private String baseURL;
 	private IssuerIdentifier identifier;
 
 	/**
@@ -88,17 +87,6 @@ public class IssuerDescription extends ConfigurationParser implements Serializab
 		return contactEMail;
 	}
 
-	/**
-	 * TODO: Remove when ready
-	 * In the Idemix-library system parameters are identified using a base URL together
-	 * with a filename to specify the specific parameter types. This function returns this
-	 * base URL.
-	 * @return The base URL for this issuer
-	 */
-	public String getBaseURL() {
-		return baseURL;
-	}
-
 	public IssuerDescription(URI file) throws InfoException {
 		super();
 		Document d = parse(file);
@@ -125,12 +113,11 @@ public class IssuerDescription extends ConfigurationParser implements Serializab
 
 		contactAddress = getFirstTagText(d, "ContactAddress");
 		contactEMail = getFirstTagText(d, "ContactEMail");
-		baseURL = getFirstTagText(d, "baseURL");
 		String schemeManager = getFirstTagText(d, "SchemeManager");
 		identifier = new IssuerIdentifier(schemeManager, id);
 	}
 
 	public String toString() {
-		return name + ": " + baseURL + " (" + contactAddress + ", " + contactEMail + ")";
+		return name + " (" + contactAddress + ", " + contactEMail + ")";
 	}
 }
