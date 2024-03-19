@@ -80,14 +80,16 @@ public class JwtParser <T> {
 
 	private void parseSignedClaims() {
 		// Hmm, got class name clash here, perhaps we should rename
-		io.jsonwebtoken.JwtParser parser = Jwts.parser()
+		io.jsonwebtoken.JwtParserBuilder parserBuilder = Jwts.parser()
 				.requireSubject(subject);
 
 		// Passing null to these setters is not allowed
 		if (key != null)
-			parser.setSigningKey(key);
+			parserBuilder.setSigningKey(key);
 		else if (keyResolver != null)
-			parser.setSigningKeyResolver(keyResolver);
+			parserBuilder.setSigningKeyResolver(keyResolver);
+
+		io.jsonwebtoken.JwtParser parser = parserBuilder.build();
 
 		Jws<Claims> parsedJwt = parser.parseClaimsJws(jwt);
 		header = parsedJwt.getHeader();
@@ -107,6 +109,7 @@ public class JwtParser <T> {
 
 		Jwt<Header, Claims> parsedJwt = Jwts.parser()
 				.requireSubject(subject)
+				.build()
 				.parseClaimsJwt(jwt);
 
 		header = parsedJwt.getHeader();
