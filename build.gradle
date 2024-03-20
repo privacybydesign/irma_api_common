@@ -1,5 +1,5 @@
 group = 'org.irmacard.api'
-version = '2.0.0'
+version = '2.0.1'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -24,15 +24,15 @@ artifacts {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.google.http-client:google-http-client:1.43.3'
-    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'commons-codec:commons-codec:1.16.1'
     implementation 'commons-io:commons-io:2.7'
     implementation 'de.henku.jpaillier:jpaillier:0.1.2'
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-    implementation 'org.apache.commons:commons-lang3:3.7'
-    implementation 'org.bouncycastle:bcpkix-jdk15on:1.70'
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.67'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.77'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
     implementation 'org.slf4j:slf4j-api:1.7.25'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
