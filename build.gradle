@@ -24,17 +24,17 @@ artifacts {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.google.http-client:google-http-client:1.43.3'
-    implementation 'commons-codec:commons-codec:1.16.1'
-    implementation 'commons-io:commons-io:2.7'
+    implementation 'com.google.code.gson:gson:2.12.1'
+    implementation 'com.google.http-client:google-http-client:1.46.3'
+    implementation 'commons-codec:commons-codec:1.18.0'
+    implementation 'commons-io:commons-io:2.18.0'
     implementation 'de.henku.jpaillier:jpaillier:0.1.2'
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
-    implementation 'org.apache.commons:commons-lang3:3.14.0'
-    implementation 'org.bouncycastle:bcpkix-jdk18on:1.77'
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
-    implementation 'org.slf4j:slf4j-api:1.7.25'
-    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.80'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.80'
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
 
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
